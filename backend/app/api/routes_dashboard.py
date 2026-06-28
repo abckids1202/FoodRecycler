@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.database.db import get_db
-from app.database.models import Analysis, DetectedLeftover, RecipeCookingSession, Recommendation
+from app.database.models import Analysis, DetectedLeftover, NotificationPreference, RecipeCookingSession, Recommendation
 from app.schemas.dashboard import DashboardSummary, FrequencyItem
 
 
@@ -54,6 +54,13 @@ def dashboard_summary(user_id: int | None = None, db: Session = Depends(get_db))
     )
     most_completed_recipe = completed_counts.most_common(1)[0][0] if completed_counts else None
     most_stopped_recipe = stopped_counts.most_common(1)[0][0] if stopped_counts else None
+    reminders_query = db.query(NotificationPreference)
+    if user_id:
+        reminders_query = reminders_query.filter(NotificationPreference.user_id == user_id)
+    reminders = reminders_query.all()
+    active_reminders = [item for item in reminders if item.stopped_at is None]
+    reactivated_reminders = [item for item in reminders if item.last_reactivated_at is not None]
+    reminder_reactivation_rate = round((len(reactivated_reminders) / len(active_reminders)) * 100, 1) if active_reminders else 0.0
 
     top_leftover_row = (
         leftovers_query.with_entities(DetectedLeftover.label)
@@ -74,6 +81,7 @@ def dashboard_summary(user_id: int | None = None, db: Session = Depends(get_db))
         completion_rate=completion_rate,
         most_completed_recipe=most_completed_recipe,
         most_stopped_recipe=most_stopped_recipe,
+        reminder_reactivation_rate=reminder_reactivation_rate,
     )
 
 

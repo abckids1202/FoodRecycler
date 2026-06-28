@@ -8,8 +8,10 @@ import LanguageSelect from "./LanguageSelect.jsx";
 
 export default function AppLayout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { logout, t, language } = useApp();
+  const { logout, t, language, user } = useApp();
   const footer = footerCopy[language] || footerCopy.en;
+  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
+  const isAdmin = user?.email && adminEmails.includes(user.email.toLowerCase());
 
   const navLinks = [
     { to: "/", label: t.navHome },
@@ -17,6 +19,8 @@ export default function AppLayout({ children }) {
     { to: "/chat", label: t.navAssistant },
     { to: "/history", label: t.navHistory },
     { to: "/dashboard", label: t.navDashboard },
+    { to: "/reminders", label: t.navReminders },
+    ...(isAdmin ? [{ to: "/admin", label: t.navAdmin }] : []),
   ];
 
   return (

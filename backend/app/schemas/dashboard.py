@@ -14,6 +14,7 @@ class DashboardSummary(BaseModel):
     completion_rate: float = 0.0
     most_completed_recipe: str | None = None
     most_stopped_recipe: str | None = None
+    reminder_reactivation_rate: float = 0.0
 
 
 class FrequencyItem(BaseModel):

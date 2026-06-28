@@ -23,6 +23,14 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
     google_redirect_uri: str = "http://127.0.0.1:8000/api/auth/google/callback"
+    admin_emails: str = ""
+    reminder_email_from: str = "FoodLoop AI <no-reply@foodloop.ai>"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    whatsapp_provider_mode: str = "disabled"
 
     model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", env_file_encoding="utf-8")
 
@@ -33,6 +41,10 @@ class Settings(BaseSettings):
     @property
     def food_json_file(self) -> Path:
         return Path(self.food_json_path)
+
+    @property
+    def admin_email_set(self) -> set[str]:
+        return {item.strip().lower() for item in self.admin_emails.split(",") if item.strip()}
 
 
 @lru_cache

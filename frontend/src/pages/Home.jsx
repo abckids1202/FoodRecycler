@@ -26,19 +26,19 @@ export default function Home() {
   return (
     <div className="space-y-6 sm:space-y-8">
       <section className="overflow-hidden rounded-lg bg-forest-900 text-white shadow-soft">
-        <div className="grid gap-8 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:p-10">
+        <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:p-10">
           <div>
             <p className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-forest-100">
               FoodLoop AI
             </p>
-            <h1 className="mt-4 max-w-3xl text-3xl font-bold tracking-normal sm:text-5xl">
+            <h1 className="mt-4 max-w-3xl text-[2rem] font-bold leading-tight tracking-normal sm:text-5xl">
               {t.homeHeroTitle}
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/75">
               {t.homeHeroDescription}
             </p>
             <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
-              <Button as={Link} to="/upload" className="w-full bg-white text-forest-900 hover:bg-forest-50 sm:w-auto">
+              <Button as={Link} to="/upload" className="w-full bg-earth-500 text-white shadow-lg shadow-black/10 hover:bg-earth-500/90 sm:w-auto">
                 <Upload size={17} /> {t.analyzeLeftovers}
               </Button>
               <Button as={Link} to="/chat" variant="secondary" className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto">
@@ -47,6 +47,13 @@ export default function Home() {
               <Button as={Link} to="/dashboard" variant="secondary" className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto">
                 <BarChart3 size={17} /> {t.viewDashboard}
               </Button>
+            </div>
+            <div className="mt-5 grid grid-cols-3 gap-2 sm:hidden">
+              {copy.mobilePills.map((item) => (
+                <div key={item} className="rounded-lg bg-white/10 px-2 py-3 text-center text-xs font-bold text-forest-50">
+                  {item}
+                </div>
+              ))}
             </div>
             <div className="mt-8 max-w-xl rounded-lg border border-white/15 bg-white/10 p-3">
               <div className="flex items-center gap-3 rounded-lg bg-white px-3 py-3 text-ink">
@@ -113,16 +120,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
         {copy.metrics.map((metric) => (
           <MetricCard key={metric.label} icon={metric.icon} label={metric.label} value={metric.value} />
         ))}
       </section>
 
+      <div className="hidden sm:block">
       <PageHeader
         title={t.simpleWayTitle}
         description={t.simpleWayDescription}
       />
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {steps.map((step, index) => (
@@ -136,7 +145,7 @@ export default function Home() {
         ))}
       </div>
 
-      <section className="grid gap-4 rounded-lg border border-forest-900/10 bg-white p-6 shadow-soft md:grid-cols-3">
+      <section className="grid gap-4 rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft md:grid-cols-3">
         <Feature icon={Upload} title={t.photoUpload} text={copy.featurePhoto} />
         <Feature icon={Camera} title={t.liveCamera} text={copy.featureCamera} />
         <Feature icon={Bot} title={t.textAssistant} text={copy.featureText} />
@@ -180,6 +189,7 @@ const homeCopy = {
       { icon: Clock, label: "Fast cooking", value: "10-30 min" },
       { icon: Sparkles, label: "AI helper", value: "Text + vision" },
     ],
+    mobilePills: ["Photo", "Text", "Safe recipe"],
     featurePhoto: "Pick a leftover photo from your device.",
     featureCamera: "Capture food directly on the Analyze page.",
     featureText: "Describe the leftovers when a photo is not enough.",
@@ -213,6 +223,7 @@ const homeCopy = {
       { icon: Clock, label: "Masak cepat", value: "10-30 menit" },
       { icon: Sparkles, label: "Asisten AI", value: "Teks + foto" },
     ],
+    mobilePills: ["Foto", "Teks", "Resep aman"],
     featurePhoto: "Pilih foto leftover dari perangkat Anda.",
     featureCamera: "Ambil foto makanan langsung dari halaman Analisis.",
     featureText: "Jelaskan leftover dengan teks saat foto belum cukup jelas.",

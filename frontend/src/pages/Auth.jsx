@@ -15,10 +15,13 @@ export default function Auth() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phoneCountryCode: "+62",
     phone: "",
     password: "",
     age: "",
     reason: "",
+    reminderOptIn: false,
+    reminderChannel: "email",
   });
   const [pendingOAuthProfile, setPendingOAuthProfile] = useState(null);
   const [status, setStatus] = useState("idle");
@@ -36,8 +39,11 @@ export default function Auth() {
       email: oauthEmail,
       provider: params.get("oauth_provider") || "google",
       phone: params.get("oauth_phone") || "",
+      phoneCountryCode: params.get("oauth_phone_country_code") || "+62",
       age: params.get("oauth_age") || "",
       reason: params.get("oauth_reason") || "",
+      reminderOptIn: params.get("oauth_reminder_opt_in") === "1",
+      reminderChannel: params.get("oauth_reminder_channel") || "none",
     };
 
     if (oauthProfile.phone && oauthProfile.age && oauthProfile.reason) {
@@ -50,8 +56,11 @@ export default function Auth() {
     setForm((current) => ({
       ...current,
       phone: oauthProfile.phone,
+      phoneCountryCode: oauthProfile.phoneCountryCode,
       age: oauthProfile.age,
       reason: oauthProfile.reason,
+      reminderOptIn: oauthProfile.reminderOptIn,
+      reminderChannel: oauthProfile.reminderChannel === "none" ? "email" : oauthProfile.reminderChannel,
     }));
     setMode("oauth-complete");
   }, [login, navigate]);
@@ -66,11 +75,14 @@ export default function Auth() {
       ? {
           ...pendingOAuthProfile,
           phone: form.phone,
+          phoneCountryCode: form.phoneCountryCode,
           age: form.age,
           reason: form.reason,
+          reminderOptIn: form.reminderOptIn,
+          reminderChannel: form.reminderOptIn ? form.reminderChannel : "none",
           provider: pendingOAuthProfile.provider || "google",
         }
-      : { ...form, provider: "email" };
+      : { ...form, provider: "email", reminderChannel: form.reminderOptIn ? form.reminderChannel : "none" };
     setStatus("loading");
     setError("");
     try {
@@ -149,7 +161,14 @@ export default function Auth() {
             {!isOAuthComplete && <Field label={t.password} value={form.password} onChange={(value) => updateField("password", value)} type="password" required />}
             {(isRegister || isOAuthComplete) && (
               <>
-                <Field label={t.phone} value={form.phone} onChange={(value) => updateField("phone", value)} type="tel" required />
+                <PhoneField
+                  label={t.phone}
+                  countryCode={form.phoneCountryCode}
+                  phone={form.phone}
+                  onCountryChange={(value) => updateField("phoneCountryCode", value)}
+                  onPhoneChange={(value) => updateField("phone", value)}
+                  copy={copy}
+                />
                 <Field label={t.age} value={form.age} onChange={(value) => updateField("age", value)} type="number" min="1" required />
                 <label className="block text-sm font-semibold text-forest-900">
                   {t.useReason}
@@ -161,6 +180,13 @@ export default function Auth() {
                     required
                   />
                 </label>
+                <ReminderConsent
+                  copy={copy}
+                  enabled={form.reminderOptIn}
+                  channel={form.reminderChannel}
+                  onEnabledChange={(value) => updateField("reminderOptIn", value)}
+                  onChannelChange={(value) => updateField("reminderChannel", value)}
+                />
               </>
             )}
 
@@ -207,6 +233,15 @@ const authCopy = {
     completeTitle: "Complete your profile",
     completeDescription: "Google sign-in is connected. Add your phone number and basic survey data before continuing.",
     completeButton: "Continue to FoodLoop",
+    countryCode: "Country",
+    phonePlaceholder: "81234567890",
+    reminderTitle: "Gentle reminders",
+    reminderText: "Optional. FoodLoop may remind you for up to 3 days, then stops automatically.",
+    reminderOptIn: "Send me non-spam reminders",
+    reminderChannel: "Reminder channel",
+    emailOnly: "Email",
+    whatsappOnly: "WhatsApp",
+    bothChannels: "Email + WhatsApp",
   },
   id: {
     authFailed: "Auth backend gagal.",
@@ -221,8 +256,86 @@ const authCopy = {
     completeTitle: "Lengkapi profil",
     completeDescription: "Google sign-in sudah tersambung. Tambahkan nomor HP dan data singkat sebelum lanjut.",
     completeButton: "Lanjut ke FoodLoop",
+    countryCode: "Negara",
+    phonePlaceholder: "81234567890",
+    reminderTitle: "Pengingat ringan",
+    reminderText: "Opsional. FoodLoop dapat mengingatkan maksimal 3 hari, lalu berhenti otomatis.",
+    reminderOptIn: "Kirim pengingat tanpa spam",
+    reminderChannel: "Channel pengingat",
+    emailOnly: "Email",
+    whatsappOnly: "WhatsApp",
+    bothChannels: "Email + WhatsApp",
   },
 };
+
+const countries = [
+  { code: "+62", label: "Indonesia (+62)" },
+  { code: "+1", label: "United States (+1)" },
+  { code: "+65", label: "Singapore (+65)" },
+  { code: "+60", label: "Malaysia (+60)" },
+  { code: "+63", label: "Philippines (+63)" },
+];
+
+function PhoneField({ label, countryCode, phone, onCountryChange, onPhoneChange, copy }) {
+  return (
+    <fieldset className="block text-sm font-semibold text-forest-900">
+      <legend>{label}</legend>
+      <div className="mt-2 grid gap-2 sm:grid-cols-[180px_1fr]">
+        <select
+          value={countryCode}
+          onChange={(event) => onCountryChange(event.target.value)}
+          className="focus-ring w-full rounded-lg border border-forest-900/10 bg-earth-50 px-3 py-3 text-sm"
+          aria-label={copy.countryCode}
+        >
+          {countries.map((country) => (
+            <option key={country.code} value={country.code}>{country.label}</option>
+          ))}
+        </select>
+        <input
+          value={phone}
+          onChange={(event) => onPhoneChange(event.target.value)}
+          type="tel"
+          className="focus-ring w-full rounded-lg border border-forest-900/10 bg-earth-50 px-3 py-3 text-sm"
+          placeholder={copy.phonePlaceholder}
+          required
+        />
+      </div>
+    </fieldset>
+  );
+}
+
+function ReminderConsent({ copy, enabled, channel, onEnabledChange, onChannelChange }) {
+  return (
+    <section className="rounded-lg border border-forest-900/10 bg-forest-50 p-4">
+      <div className="flex items-start gap-3">
+        <input
+          checked={enabled}
+          onChange={(event) => onEnabledChange(event.target.checked)}
+          type="checkbox"
+          className="mt-1 h-4 w-4 rounded border-forest-900/20"
+        />
+        <label className="text-sm">
+          <span className="block font-bold text-forest-900">{copy.reminderOptIn}</span>
+          <span className="mt-1 block leading-5 text-ink/65">{copy.reminderText}</span>
+        </label>
+      </div>
+      {enabled && (
+        <label className="mt-3 block text-sm font-semibold text-forest-900">
+          {copy.reminderChannel}
+          <select
+            value={channel}
+            onChange={(event) => onChannelChange(event.target.value)}
+            className="focus-ring mt-2 w-full rounded-lg border border-forest-900/10 bg-white px-3 py-3 text-sm"
+          >
+            <option value="email">{copy.emailOnly}</option>
+            <option value="whatsapp">{copy.whatsappOnly}</option>
+            <option value="email_whatsapp">{copy.bothChannels}</option>
+          </select>
+        </label>
+      )}
+    </section>
+  );
+}
 
 function Field({ label, value, onChange, type = "text", ...props }) {
   return (

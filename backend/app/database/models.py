@@ -17,8 +17,13 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     auth_provider: Mapped[str] = mapped_column(String(40), default="email")
     phone: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    phone_country_code: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
+    phone_national_number: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
+    phone_e164: Mapped[Optional[str]] = mapped_column(String(40), nullable=True)
     age: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     use_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reminder_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    reminder_channel: Mapped[str] = mapped_column(String(40), default="none")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     analyses: Mapped[list["Analysis"]] = relationship(back_populates="user")
@@ -117,3 +122,36 @@ class UserFeedback(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped[Optional[User]] = relationship()
+
+
+class NotificationPreference(Base):
+    __tablename__ = "notification_preferences"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True, nullable=False)
+    email_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    whatsapp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    consent_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reminder_stage: Mapped[int] = mapped_column(Integer, default=0)
+    next_reminder_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    stopped_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    last_reactivated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped[User] = relationship()
+
+
+class NotificationLog(Base):
+    __tablename__ = "notification_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    channel: Mapped[str] = mapped_column(String(40), nullable=False)
+    stage: Mapped[int] = mapped_column(Integer, default=1)
+    status: Mapped[str] = mapped_column(String(40), default="queued")
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    provider_response: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped[User] = relationship()

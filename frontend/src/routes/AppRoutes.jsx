@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "../components/AppLayout.jsx";
 import { useApp } from "../context/AppContext.jsx";
 import AnalysisResult from "../pages/AnalysisResult.jsx";
+import AdminPanel from "../pages/AdminPanel.jsx";
 import ChatHelper from "../pages/ChatHelper.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Auth from "../pages/Auth.jsx";
@@ -11,6 +12,7 @@ import Home from "../pages/Home.jsx";
 import RecipeDetail from "../pages/RecipeDetail.jsx";
 import RecipeCookingGuide from "../pages/RecipeCookingGuide.jsx";
 import RecipeRecommendations from "../pages/RecipeRecommendations.jsx";
+import ReminderSettings from "../pages/ReminderSettings.jsx";
 import Upload from "../pages/Upload.jsx";
 
 export default function AppRoutes() {
@@ -36,6 +38,8 @@ export default function AppRoutes() {
                 <Route path="/history" element={<History />} />
                 <Route path="/history/:analysisId" element={<HistoryDetail />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/reminders" element={<ReminderSettings />} />
+                <Route path="/admin" element={<AdminPanel />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </AppLayout>

@@ -24,8 +24,12 @@ export function AppProvider({ children }) {
       name: profile.name || profile.email?.split("@")[0] || "FoodLoop User",
       email: profile.email || "demo@foodloop.ai",
       phone: profile.phone || "",
+      phoneCountryCode: profile.phone_country_code || profile.phoneCountryCode || "+62",
+      phoneE164: profile.phone_e164 || profile.phoneE164 || "",
       age: profile.age || "",
       reason: profile.reason || "",
+      reminderOptIn: Boolean(profile.reminder_opt_in || profile.reminderOptIn),
+      reminderChannel: profile.reminder_channel || profile.reminderChannel || "none",
       provider: profile.provider || "email",
     };
     setUser(nextUser);

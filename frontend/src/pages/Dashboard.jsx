@@ -41,6 +41,7 @@ export default function Dashboard() {
           completionRate: summaryResult.completion_rate,
           mostCompletedRecipe: summaryResult.most_completed_recipe || copy.noneYet,
           mostStoppedRecipe: summaryResult.most_stopped_recipe || copy.noneYet,
+          reminderReactivationRate: summaryResult.reminder_reactivation_rate,
         });
         setMaterialData(leftoversResult);
         setRecipeData(recipesResult);
@@ -99,6 +100,7 @@ function InsightCard({ summary, copy }) {
         <MiniInsight label={copy.mostStoppedRecipe} value={summary.mostStoppedRecipe} />
         <MiniInsight label={copy.startedSessions} value={summary.recipesStarted} />
         <MiniInsight label={copy.finishedSessions} value={summary.recipesFinished} />
+        <MiniInsight label={copy.reminderReactivationRate} value={`${summary.reminderReactivationRate}%`} />
       </div>
     </section>
   );
@@ -122,6 +124,7 @@ const dashboardCopy = {
     mostStoppedRecipe: "Most stopped recipe",
     startedSessions: "Started sessions",
     finishedSessions: "Finished sessions",
+    reminderReactivationRate: "Reminder reactivation",
   },
   id: {
     eyebrow: "Analitik",
@@ -140,6 +143,7 @@ const dashboardCopy = {
     mostStoppedRecipe: "Resep paling sering berhenti",
     startedSessions: "Sesi dimulai",
     finishedSessions: "Sesi selesai",
+    reminderReactivationRate: "Reaktivasi pengingat",
   },
 };
 
