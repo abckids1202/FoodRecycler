@@ -1,0 +1,17 @@
+{
+  "name": "foodloop-ai",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace foodloop-ai-frontend",
+    "dev:backend": "cd backend && python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+    "build": "npm run build --workspace foodloop-ai-frontend",
+    "preview": "npm run preview --workspace foodloop-ai-frontend"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}

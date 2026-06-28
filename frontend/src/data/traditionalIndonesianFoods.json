@@ -1,0 +1,33 @@
+{
+  "version": "0.1.0",
+  "description": "Starter structure for custom traditional Indonesian food matching. Backend will become the source of truth later.",
+  "recipes": [
+    {
+      "id": "nasi-goreng-kampung",
+      "name": "Nasi Goreng Kampung",
+      "region": "Indonesia",
+      "leftover_matches": ["cooked_rice", "egg", "vegetable_leftover", "chicken_leftover", "sambal"],
+      "required_safety": ["rice_refrigerated_or_fresh", "no_spoilage_sign", "reheat_until_steaming"],
+      "difficulty": "easy",
+      "estimated_time": "15-20 minutes"
+    },
+    {
+      "id": "nasi-telur-sambal",
+      "name": "Nasi Telur Sambal",
+      "region": "Indonesia",
+      "leftover_matches": ["cooked_rice", "egg", "sambal"],
+      "required_safety": ["rice_refrigerated_or_fresh", "egg_cooked_fully"],
+      "difficulty": "easy",
+      "estimated_time": "10-15 minutes"
+    },
+    {
+      "id": "perkedel-nasi",
+      "name": "Perkedel Nasi",
+      "region": "Indonesia",
+      "leftover_matches": ["cooked_rice", "egg", "vegetable_leftover"],
+      "required_safety": ["no_spoilage_sign", "cook_until_hot_inside"],
+      "difficulty": "medium",
+      "estimated_time": "25-35 minutes"
+    }
+  ]
+}
