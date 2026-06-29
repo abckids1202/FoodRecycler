@@ -110,19 +110,20 @@ export default function RecipeCookingGuide() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={detail?.recipe_name || copy.startMaking}
-        description={copy.description}
-      />
+      <section className="rounded-[2rem] bg-forest-900 p-6 text-white shadow-soft sm:p-8">
+        <p className="text-sm font-black uppercase tracking-[0.16em] text-food-yellow">{copy.eyebrow}</p>
+        <h1 className="mt-3 text-4xl font-black leading-tight sm:text-5xl">{detail?.recipe_name || copy.startMaking}</h1>
+        <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">{copy.description}</p>
+      </section>
 
       {status === "loading" && <LoadingState title={copy.loadingTitle} message={copy.loadingMessage} />}
       {status === "error" && <ErrorState title={copy.errorTitle} message={error} />}
       {error && status !== "error" && <ErrorState title={copy.actionErrorTitle} message={error} />}
 
       {status === "ready" && phase === "materials" && (
-        <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
-          <h2 className="text-xl font-bold text-forest-900">{copy.confirmTitle}</h2>
-          <p className="mt-2 text-sm leading-6 text-ink/65">
+        <section className="rounded-[2rem] border border-forest-900/10 bg-white p-5 shadow-soft sm:p-7">
+          <h2 className="text-3xl font-black text-forest-900">{copy.confirmTitle}</h2>
+          <p className="mt-2 text-lg leading-8 text-ink/65">
             {copy.confirmText}
           </p>
 
@@ -132,12 +133,12 @@ export default function RecipeCookingGuide() {
 
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {materials.map((item) => (
-              <label key={`${item.source}-${item.label}`} className="flex items-center gap-3 rounded-lg border border-forest-900/10 bg-earth-50 px-4 py-3 text-sm font-semibold text-forest-900">
+              <label key={`${item.source}-${item.label}`} className="flex min-h-14 items-center gap-3 rounded-2xl border border-forest-900/10 bg-earth-50 px-4 py-3 text-base font-bold text-forest-900">
                 <input
                   type="checkbox"
                   checked={Boolean(checkedItems[item.label])}
                   onChange={(event) => setCheckedItems((current) => ({ ...current, [item.label]: event.target.checked }))}
-                  className="h-4 w-4 accent-forest-700"
+                  className="h-5 w-5 accent-forest-700"
                 />
                 <span className="min-w-0">
                   {item.label}
@@ -146,14 +147,14 @@ export default function RecipeCookingGuide() {
               </label>
             ))}
           </div>
-          <p className="mt-3 text-xs leading-5 text-ink/55">{copy.requiredOnlyHint}</p>
+          <p className="mt-3 text-sm leading-6 text-ink/60">{copy.requiredOnlyHint}</p>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button type="button" onClick={handleStart} disabled={!requiredMaterialsReady}>
+            <Button type="button" className="min-h-14 rounded-2xl text-base" onClick={handleStart} disabled={!requiredMaterialsReady}>
               <CheckCircle2 size={18} />
               {copy.startCooking}
             </Button>
-            <Button type="button" variant="secondary" onClick={() => navigate(`/recipes/${recipeId}`)}>
+            <Button type="button" variant="secondary" className="min-h-14 rounded-2xl text-base" onClick={() => navigate(`/recipes/${recipeId}`)}>
               {copy.backToPreview}
             </Button>
           </div>
@@ -161,51 +162,67 @@ export default function RecipeCookingGuide() {
       )}
 
       {status === "ready" && phase === "steps" && (
-        <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
+        <section className="rounded-[2rem] border border-forest-900/10 bg-white p-5 shadow-soft sm:p-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-bold text-forest-700">{copy.step} {stepIndex + 1} {copy.of} {steps.length}</p>
-              <h2 className="mt-1 text-2xl font-bold text-forest-900">{stepIndex === 0 ? copy.safetyCheck : `${copy.step} ${stepIndex + 1}`}</h2>
+              <p className="text-base font-black text-forest-700">{copy.step} {stepIndex + 1} {copy.of} {steps.length}</p>
+              <h2 className="mt-1 text-4xl font-black text-forest-900">{stepIndex === 0 ? copy.safetyCheck : `${copy.step} ${stepIndex + 1}`}</h2>
             </div>
-            <span className="rounded-full bg-forest-50 px-3 py-1 text-sm font-bold text-forest-700">
+            <span className="rounded-full bg-mint px-4 py-2 text-sm font-black text-forest-900">
               {copy.session} #{session?.id}
             </span>
           </div>
 
-          <div className="mt-6 rounded-lg bg-earth-50 p-5 text-lg leading-8 text-ink/80">
+          <div className="mt-5 h-3 overflow-hidden rounded-full bg-earth-100">
+            <div className="h-full rounded-full bg-forest-900 transition-all" style={{ width: `${((stepIndex + 1) / Math.max(steps.length, 1)) * 100}%` }} />
+          </div>
+
+          <div className="mt-6 rounded-[2rem] bg-earth-50 p-6 text-2xl font-semibold leading-10 text-ink/85">
             {steps[stepIndex] || copy.noStep}
           </div>
 
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button type="button" variant="secondary" onClick={() => moveToStep(stepIndex - 1)} disabled={stepIndex === 0}>
+            <Button type="button" variant="secondary" className="min-h-14 rounded-2xl text-base" onClick={() => moveToStep(stepIndex - 1)} disabled={stepIndex === 0}>
               <ChevronLeft size={18} />
               {copy.previous}
             </Button>
             {stepIndex < steps.length - 1 ? (
-              <Button type="button" onClick={() => moveToStep(stepIndex + 1)}>
+              <Button type="button" className="min-h-14 rounded-2xl text-base" onClick={() => moveToStep(stepIndex + 1)}>
                 {copy.nextStep}
                 <ChevronRight size={18} />
               </Button>
             ) : (
-              <Button type="button" onClick={handleFinish}>
+              <Button type="button" className="min-h-14 rounded-2xl text-base" onClick={handleFinish}>
                 <Flag size={18} />
                 {copy.finishRecipe}
               </Button>
             )}
           </div>
 
-          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+          <div className="mt-6 rounded-[2rem] border border-red-200 bg-red-50 p-5">
             <h3 className="flex items-center gap-2 font-bold text-red-800">
               <AlertTriangle size={18} />
               {copy.needStop}
             </h3>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {copy.stopReasons.map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  onClick={() => setProblemNote(reason)}
+                  className="focus-ring rounded-full bg-white px-3 py-2 text-sm font-bold text-red-800"
+                >
+                  {reason}
+                </button>
+              ))}
+            </div>
             <textarea
               value={problemNote}
               onChange={(event) => setProblemNote(event.target.value)}
-              className="focus-ring mt-3 min-h-20 w-full resize-y rounded-lg border border-red-200 bg-white px-3 py-2 text-sm"
+              className="focus-ring mt-3 min-h-24 w-full resize-y rounded-2xl border border-red-200 bg-white px-4 py-3 text-base"
               placeholder={copy.stopPlaceholder}
             />
-            <Button type="button" variant="warning" className="mt-3" onClick={handleStop}>
+            <Button type="button" variant="warning" className="mt-3 min-h-14 rounded-2xl text-base" onClick={handleStop}>
               <XCircle size={18} />
               {copy.stopAndSave}
             </Button>
@@ -237,6 +254,7 @@ export default function RecipeCookingGuide() {
 const cookingCopy = {
   en: {
     startMaking: "Start Making",
+    eyebrow: "Cooking guide",
     description: "Confirm your materials, then follow the recipe one step at a time.",
     loadingTitle: "Loading cooking guide",
     loadingMessage: "Preparing materials and steps.",
@@ -260,6 +278,7 @@ const cookingCopy = {
     needStop: "Need to stop?",
     stopPlaceholder: "What happened? Example: smell changed, missing ingredient, texture looked slimy, unsure about storage.",
     stopAndSave: "Stop and Save Problem",
+    stopReasons: ["Missing ingredient", "Food seems spoiled", "No time", "Too difficult", "Other"],
     noNote: "No note provided.",
     finishedTitle: "Recipe finished",
     finishedMessage: "Nice. This completed recipe has been saved to your cooking history.",
@@ -270,6 +289,7 @@ const cookingCopy = {
   },
   id: {
     startMaking: "Mulai Memasak",
+    eyebrow: "Panduan memasak",
     description: "Konfirmasi bahan, lalu ikuti resep satu langkah demi satu langkah.",
     loadingTitle: "Memuat panduan memasak",
     loadingMessage: "Menyiapkan bahan dan langkah.",
@@ -293,6 +313,7 @@ const cookingCopy = {
     needStop: "Perlu berhenti?",
     stopPlaceholder: "Apa yang terjadi? Contoh: bau berubah, bahan kurang, tekstur berlendir, ragu soal penyimpanan.",
     stopAndSave: "Berhenti dan Simpan Masalah",
+    stopReasons: ["Bahan kurang", "Bahan ternyata basi", "Tidak punya waktu", "Resep terlalu sulit", "Lainnya"],
     noNote: "Tidak ada catatan.",
     finishedTitle: "Resep selesai",
     finishedMessage: "Bagus. Resep yang selesai sudah disimpan ke riwayat memasak.",

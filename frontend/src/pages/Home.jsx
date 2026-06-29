@@ -1,315 +1,326 @@
-import { Bot, Camera, ChevronRight, Clock, FileText, Search, ShieldCheck, Sparkles, Upload, Utensils } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { ArrowRight, Camera, CheckCircle2, Image, MessageSquare, ShieldCheck, Sparkles, Utensils } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button.jsx";
-import PageHeader from "../components/PageHeader.jsx";
+import Card from "../components/Card.jsx";
+import ChatPreviewMockup from "../components/ChatPreviewMockup.jsx";
+import CookingGuideMockup from "../components/CookingGuideMockup.jsx";
+import FoodChip from "../components/FoodChip.jsx";
+import PhoneMockup from "../components/PhoneMockup.jsx";
+import ProgressMockup from "../components/ProgressMockup.jsx";
+import RecipePreviewMockup from "../components/RecipePreviewMockup.jsx";
+import SafetyCheckMockup from "../components/SafetyCheckMockup.jsx";
 import { useApp } from "../context/AppContext.jsx";
 
 export default function Home() {
-  const { t, language } = useApp();
-  const copy = homeCopy[language] || homeCopy.en;
-  const [activeRecipe, setActiveRecipe] = useState(0);
-  const steps = [
-    { title: t.stepShareTitle, text: t.stepShareText },
-    { title: t.stepDetectTitle, text: t.stepDetectText },
-    { title: t.stepMatchTitle, text: t.stepMatchText },
-    { title: t.stepSaveTitle, text: t.stepSaveText },
-  ];
+  const { language } = useApp();
+  const copy = homeCopy[language] || homeCopy.id;
+  const [quickInput, setQuickInput] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveRecipe((current) => (current + 1) % copy.sliderRecipes.length);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [copy.sliderRecipes.length]);
+  function submitQuickInput(event) {
+    event.preventDefault();
+    navigate("/start", { state: { initialText: quickInput.trim() } });
+  }
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      <section className="overflow-hidden rounded-lg bg-forest-900 text-white shadow-soft">
-        <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:p-10">
+    <div className="space-y-14 overflow-hidden pb-8">
+      <section className="relative overflow-hidden rounded-[2rem] bg-forest-900 text-white shadow-soft">
+        <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-food-yellow/25 blur-3xl" />
+        <div className="absolute -bottom-24 left-1/2 h-80 w-80 rounded-full bg-mint/15 blur-3xl" />
+        <div className="relative grid gap-10 px-5 py-8 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:px-12 lg:py-14">
           <div>
-            <p className="inline-flex rounded-full bg-white/10 px-3 py-1 text-sm font-semibold text-forest-100">
-              FoodLoop AI
-            </p>
-            <h1 className="mt-4 max-w-3xl text-[2rem] font-bold leading-tight tracking-normal sm:text-5xl">
-              {t.homeHeroTitle}
+            <div className="flex flex-wrap gap-2">
+              <FoodChip tone="cream">FoodLoop AI</FoodChip>
+              <FoodChip tone="yellow">{copy.heroPill}</FoodChip>
+            </div>
+            <h1 className="mt-6 max-w-3xl text-5xl font-black leading-[0.96] tracking-normal sm:text-6xl lg:text-7xl">
+              {copy.heroTitle}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/75">
-              {t.homeHeroDescription}
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80">
+              {copy.heroSubtitle}
             </p>
-            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
-              <Button as={Link} to="/upload" className="w-full bg-earth-500 text-white shadow-lg shadow-black/10 hover:bg-earth-500/90 sm:w-auto">
-                <Upload size={17} /> {t.analyzeLeftovers}
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button as={Link} to="/start" className="min-h-14 rounded-2xl bg-food-yellow px-6 text-base text-forest-900 hover:bg-food-yellow/90">
+                {copy.primaryCta} <ArrowRight size={19} />
               </Button>
-              <Button as="a" href="#contoh" variant="secondary" className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto">
-                <Bot size={17} /> {copy.exampleButton}
+              <Button as="a" href="#cara-kerja" variant="secondary" className="min-h-14 rounded-2xl border-white/20 bg-white/10 px-6 text-base text-white hover:bg-white/15">
+                {copy.secondaryCta}
               </Button>
             </div>
-            <div className="mt-5 grid grid-cols-3 gap-2 sm:hidden">
-              {copy.mobilePills.map((item) => (
-                <div key={item} className="rounded-lg bg-white/10 px-2 py-3 text-center text-xs font-bold text-forest-50">
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="mt-8 max-w-xl rounded-lg border border-white/15 bg-white/10 p-3">
-              <div className="flex items-center gap-3 rounded-lg bg-white px-3 py-3 text-ink">
-                <Search size={18} className="text-forest-700" />
-                <span className="text-sm text-ink/65">{copy.searchPlaceholder}</span>
-                <ChevronRight size={18} className="ml-auto text-forest-700" />
-              </div>
-            </div>
+            <p className="mt-4 text-sm font-semibold text-white/65">{copy.trustLine}</p>
+            <form onSubmit={submitQuickInput} className="mt-7 flex flex-col gap-3 rounded-3xl border border-white/15 bg-white/10 p-3 backdrop-blur sm:flex-row">
+              <input
+                value={quickInput}
+                onChange={(event) => setQuickInput(event.target.value)}
+                className="focus-ring min-h-14 flex-1 rounded-2xl border border-white/10 bg-white px-4 text-base font-semibold text-forest-900 placeholder:text-ink/40"
+                placeholder={copy.quickPlaceholder}
+              />
+              <Button className="min-h-14 rounded-2xl px-6" type="submit">
+                {copy.quickButton}
+              </Button>
+            </form>
           </div>
-          <div className="grid content-center">
-            <div className="rounded-lg border border-white/15 bg-white/10 p-5">
-              <p className="text-sm font-semibold text-forest-100">{copy.popularTitle}</p>
-              <div className="mt-4 space-y-3">
-                {copy.heroDishes.map((dish) => (
-                  <HeroDish key={dish.name} name={dish.name} meta={dish.meta} badge={dish.badge} />
-                ))}
-              </div>
+
+          <div className="relative">
+            <div className="absolute -left-4 top-6 hidden rotate-[-8deg] md:block">
+              <FoodChip>nasi</FoodChip>
             </div>
+            <div className="absolute right-2 top-2 hidden rotate-[9deg] md:block">
+              <FoodChip tone="yellow">sambal</FoodChip>
+            </div>
+            <div className="absolute -bottom-2 right-10 hidden rotate-[-5deg] md:block">
+              <FoodChip>telur</FoodChip>
+            </div>
+            <PhoneMockup>
+              <ChatPreviewMockup language={language} />
+            </PhoneMockup>
           </div>
         </div>
-      </section>
-
-      <section id="contoh" className="overflow-hidden rounded-lg border border-forest-900/10 bg-white shadow-soft">
-        <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[280px_1fr] lg:items-center">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-forest-700">{copy.sliderEyebrow}</p>
-            <h2 className="mt-2 text-2xl font-bold text-forest-900">{copy.sliderTitle}</h2>
-            <p className="mt-2 text-sm leading-6 text-ink/65">{copy.sliderDescription}</p>
-          </div>
-          <div className="relative min-h-[190px]">
-            {copy.sliderRecipes.map((recipe, index) => (
-              <article
-                key={recipe.name}
-                className={[
-                  "absolute inset-0 rounded-lg border border-forest-900/10 bg-earth-50 p-5 transition duration-500",
-                  index === activeRecipe ? "translate-x-0 opacity-100" : "translate-x-5 opacity-0 pointer-events-none",
-                ].join(" ")}
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-forest-700">{recipe.badge}</span>
-                    <h3 className="mt-4 text-xl font-bold text-forest-900">{recipe.name}</h3>
-                    <p className="mt-2 text-sm leading-6 text-ink/65">{recipe.description}</p>
-                  </div>
-                  <span className="w-fit rounded-lg bg-forest-900 px-3 py-2 text-sm font-black text-white">{recipe.time}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-        <div className="flex justify-center gap-2 pb-5">
-          {copy.sliderRecipes.map((recipe, index) => (
-            <button
-              key={recipe.name}
-              type="button"
-              onClick={() => setActiveRecipe(index)}
-              className={[
-                "focus-ring h-2.5 rounded-full transition",
-                index === activeRecipe ? "w-8 bg-forest-700" : "w-2.5 bg-forest-900/20",
-              ].join(" ")}
-              aria-label={`${copy.sliderGoTo} ${index + 1}`}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-        {copy.metrics.map((metric) => (
-          <MetricCard key={metric.label} icon={metric.icon} label={metric.label} value={metric.value} />
-        ))}
-      </section>
-
-      <div className="hidden sm:block">
-      <PageHeader
-        title={t.simpleWayTitle}
-        description={t.simpleWayDescription}
-      />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {steps.map((step, index) => (
-          <div key={step.title} className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-forest-50 text-sm font-bold text-forest-700">
-              {index + 1}
-            </span>
-            <h2 className="mt-4 text-lg font-bold text-forest-900">{step.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-ink/65">{step.text}</p>
-          </div>
-        ))}
-      </div>
-
-      <section className="grid gap-4 rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft md:grid-cols-3">
-        <Feature icon={Upload} title={t.photoUpload} text={copy.featurePhoto} />
-        <Feature icon={Camera} title={t.liveCamera} text={copy.featureCamera} />
-        <Feature icon={Bot} title={t.textAssistant} text={copy.featureText} />
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
-        {copy.menuCards.map((card) => (
-          <MenuCard key={card.title} title={card.title} items={card.items} />
+        {copy.valueCards.map((item) => (
+          <Card key={item.title} className="p-5">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-mint text-forest-900">
+              <item.icon size={22} />
+            </span>
+            <h2 className="mt-4 text-xl font-black text-forest-900">{item.title}</h2>
+            <p className="mt-2 text-base leading-7 text-ink/70">{item.text}</p>
+          </Card>
         ))}
       </section>
 
-      <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
-        <h2 className="text-xl font-bold text-forest-900">{copy.fitTitle}</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {copy.fitItems.map((item) => (
-            <div key={item} className="rounded-lg bg-forest-50 px-4 py-3 text-sm font-bold text-forest-900">
-              {item}
-            </div>
+      <section className="space-y-5" id="cara-kerja">
+        <SectionHeader eyebrow={copy.transformEyebrow} title={copy.transformTitle} text={copy.transformText} />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {copy.transforms.map((item) => (
+            <Card key={item.before} className="p-5">
+              <p className="rounded-2xl bg-earth-50 p-4 text-base font-black text-forest-900">{item.before}</p>
+              <div className="my-4 flex items-center gap-3 text-sm font-black text-forest-700">
+                <span className="h-px flex-1 bg-forest-900/10" />
+                {copy.checksSafety}
+                <span className="h-px flex-1 bg-forest-900/10" />
+              </div>
+              <p className="rounded-2xl bg-mint p-4 text-base font-black text-forest-900">{item.after}</p>
+            </Card>
           ))}
         </div>
-        <p className="mt-4 rounded-lg bg-earth-50 px-4 py-3 text-sm font-semibold text-ink/75">{copy.beforeAfter}</p>
       </section>
 
-      <section className="rounded-lg border border-forest-900/10 bg-white p-6 shadow-soft">
-        <div className="flex items-start gap-4">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-forest-50 text-forest-700">
-            <FileText size={22} />
-          </span>
-          <div>
-            <h2 className="text-xl font-bold text-forest-900">{t.pdfTitle}</h2>
-            <p className="mt-2 text-sm leading-6 text-ink/65">
-              {copy.pdfText}
-            </p>
-          </div>
+      <section className="space-y-5">
+        <SectionHeader eyebrow={copy.stepsEyebrow} title={copy.stepsTitle} text={copy.stepsText} />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {copy.steps.map((step, index) => (
+            <Card key={step.title} className="p-5">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-900 text-xl font-black text-white">{index + 1}</span>
+              <h3 className="mt-5 text-xl font-black text-forest-900">{step.title}</h3>
+              <p className="mt-2 text-base leading-7 text-ink/70">{step.text}</p>
+            </Card>
+          ))}
         </div>
       </section>
+
+      <ProductSection
+        eyebrow={copy.previewA.eyebrow}
+        title={copy.previewA.title}
+        text={copy.previewA.text}
+        mockup={<PhoneMockup><div className="space-y-3"><MockInput icon={Camera} text={copy.photoMockup} /><MockInput icon={Image} text={copy.galleryMockup} /><MockInput icon={MessageSquare} text={copy.textMockup} /></div></PhoneMockup>}
+      />
+
+      <ProductSection
+        flip
+        eyebrow={copy.previewB.eyebrow}
+        title={copy.previewB.title}
+        text={copy.previewB.text}
+        mockup={<SafetyCheckMockup language={language} />}
+      />
+
+      <ProductSection
+        eyebrow={copy.previewC.eyebrow}
+        title={copy.previewC.title}
+        text={copy.previewC.text}
+        mockup={<RecipePreviewMockup language={language} />}
+      />
+
+      <ProductSection
+        flip
+        eyebrow={copy.previewD.eyebrow}
+        title={copy.previewD.title}
+        text={copy.previewD.text}
+        mockup={<CookingGuideMockup language={language} />}
+      />
+
+      <ProductSection
+        eyebrow={copy.previewE.eyebrow}
+        title={copy.previewE.title}
+        text={copy.previewE.text}
+        mockup={<ProgressMockup language={language} />}
+      />
+
+      <section className="space-y-5">
+        <SectionHeader eyebrow={copy.useCaseEyebrow} title={copy.useCaseTitle} text={copy.useCaseText} />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {copy.useCases.map((item) => (
+            <Card key={item.title} className="p-5">
+              <h3 className="text-xl font-black text-forest-900">{item.title}</h3>
+              <p className="mt-2 text-base leading-7 text-ink/70">{item.text}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] bg-forest-900 p-6 text-center text-white shadow-soft sm:p-10">
+        <Sparkles className="mx-auto text-food-yellow" size={34} />
+        <h2 className="mx-auto mt-4 max-w-2xl text-4xl font-black leading-tight">{copy.finalTitle}</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-white/75">{copy.finalText}</p>
+        <Button as={Link} to="/start" className="mt-7 min-h-14 rounded-2xl bg-food-yellow px-7 text-base text-forest-900 hover:bg-food-yellow/90">
+          {copy.primaryCta} <ArrowRight size={19} />
+        </Button>
+      </section>
     </div>
   );
 }
+
+function SectionHeader({ eyebrow, title, text }) {
+  return (
+    <div className="mx-auto max-w-3xl text-center">
+      <p className="text-sm font-black uppercase tracking-[0.16em] text-forest-700">{eyebrow}</p>
+      <h2 className="mt-2 text-3xl font-black leading-tight text-forest-900 sm:text-4xl">{title}</h2>
+      <p className="mt-3 text-lg leading-8 text-ink/68">{text}</p>
+    </div>
+  );
+}
+
+function ProductSection({ eyebrow, title, text, mockup, flip = false }) {
+  return (
+    <section className={`grid gap-7 rounded-[2rem] bg-white/55 p-5 sm:p-8 lg:grid-cols-2 lg:items-center ${flip ? "lg:[&>*:first-child]:order-2" : ""}`}>
+      <div>
+        <p className="text-sm font-black uppercase tracking-[0.16em] text-forest-700">{eyebrow}</p>
+        <h2 className="mt-3 text-3xl font-black leading-tight text-forest-900 sm:text-4xl">{title}</h2>
+        <p className="mt-4 text-lg leading-8 text-ink/70">{text}</p>
+      </div>
+      <div>{mockup}</div>
+    </section>
+  );
+}
+
+function MockInput({ icon: Icon, text }) {
+  return (
+    <div className="flex items-center gap-3 rounded-3xl bg-white p-4 shadow-sm">
+      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-mint text-forest-900">
+        <Icon size={21} />
+      </span>
+      <p className="text-base font-black text-forest-900">{text}</p>
+    </div>
+  );
+}
+
+const sharedIcons = [Camera, ShieldCheck, Utensils];
 
 const homeCopy = {
-  en: {
-    exampleButton: "See Example",
-    searchPlaceholder: "Example: leftover rice, eggs, sambal, fried chicken...",
-    popularTitle: "Often-used ideas",
-    heroDishes: [
-      { name: "Nasi Goreng Kampung", meta: "Rice + egg + sambal", badge: "15 min" },
-      { name: "Nasi Telur Sambal", meta: "Fast breakfast idea", badge: "Easy" },
-      { name: "Perkedel Nasi", meta: "Turn rice into a side dish", badge: "Practical" },
-    ],
-    metrics: [
-      { icon: Utensils, label: "Indonesian menu", value: "Familiar food" },
-      { icon: ShieldCheck, label: "Safety-first", value: "Condition check" },
-      { icon: Clock, label: "Fast cooking", value: "10-30 min" },
-      { icon: Sparkles, label: "AI helper", value: "Text + vision" },
-    ],
-    mobilePills: ["Photo", "Text", "Safe recipe"],
-    featurePhoto: "Pick a leftover photo from your device.",
-    featureCamera: "Capture food directly on the Analyze page.",
-    featureText: "Describe the leftovers when a photo is not enough.",
-    fitTitle: "Useful for",
-    fitItems: ["Families at home", "Students", "Small food stalls", "Anyone with leftover rice or vegetables"],
-    beforeAfter: "Example: leftover rice + egg + sambal -> nasi goreng kampung in about 15 minutes.",
-    menuCards: [
-      { title: "Leftover rice", items: ["Village fried rice", "Rice with egg and sambal", "Rice fritters"] },
-      { title: "Leftover proteins", items: ["Spicy shredded chicken", "Sauteed tofu and tempeh", "Omelet filling"] },
-      { title: "Leftover vegetables", items: ["Vegetable soup", "Quick capcay", "Fried rice mix-in"] },
-    ],
-    pdfText: "Generated PDFs include detected foods, freshness warnings, Indonesian recipe steps, serving guidance, storage notes, mistakes to avoid, and a safety disclaimer.",
-    sliderEyebrow: "Recipe ideas",
-    sliderTitle: "From leftovers to ready meals",
-    sliderDescription: "A rotating preview of what FoodLoop can suggest after the safety check.",
-    sliderGoTo: "Go to recipe slide",
-    sliderRecipes: [
-      { name: "Nasi Goreng Kampung", badge: "Best for rice", time: "15 min", description: "Uses leftover rice, egg, sambal, and simple vegetables for a quick household meal." },
-      { name: "Tumis Tahu Tempe", badge: "Practical protein", time: "20 min", description: "Turns tofu or tempeh leftovers into a warm side dish with Indonesian seasoning." },
-      { name: "Roti Pisang Panggang", badge: "Sweet option", time: "12 min", description: "A simple snack idea for leftover bread and banana before they go to waste." },
-    ],
-  },
   id: {
-    exampleButton: "Lihat Contoh",
-    searchPlaceholder: "Contoh: nasi sisa, telur, sambal, ayam goreng...",
-    popularTitle: "Ide yang sering dipakai",
-    heroDishes: [
-      { name: "Nasi Goreng Kampung", meta: "Nasi + telur + sambal", badge: "15 menit" },
-      { name: "Nasi Telur Sambal", meta: "Cepat untuk sarapan", badge: "Mudah" },
-      { name: "Perkedel Nasi", meta: "Ubah nasi jadi lauk", badge: "Praktis" },
+    heroPill: "Asisten dapur Indonesia",
+    heroTitle: "Sisa makanan jadi resep aman. Dalam beberapa langkah.",
+    heroSubtitle: "Foto atau tulis makanan yang Anda punya. FoodLoop membantu cek keamanan, memberi ide resep Indonesia, dan memandu langkah memasak.",
+    primaryCta: "Mulai Sekarang",
+    secondaryCta: "Lihat Cara Kerja",
+    trustLine: "Cocok untuk rumah tangga, anak kos, warung kecil, dan orang tua.",
+    quickPlaceholder: "Contoh: nasi sisa, telur, sambal...",
+    quickButton: "Cari ide",
+    valueCards: [
+      { icon: sharedIcons[0], title: "Foto atau tulis bebas", text: "Tidak perlu format rumit. Ambil foto atau ketik bahan dengan bahasa sehari-hari." },
+      { icon: sharedIcons[1], title: "Utamakan keamanan", text: "FoodLoop mengingatkan soal bau, lendir, jamur, suhu ruang, dan penyimpanan." },
+      { icon: sharedIcons[2], title: "Resep Indonesia", text: "Saran dibuat untuk makanan familiar seperti nasi goreng, omelet, perkedel, dan tumisan." },
     ],
-    metrics: [
-      { icon: Utensils, label: "Menu Indonesia", value: "Masakan familiar" },
-      { icon: ShieldCheck, label: "Utamakan aman", value: "Cek kondisi" },
-      { icon: Clock, label: "Masak cepat", value: "10-30 menit" },
-      { icon: Sparkles, label: "Asisten AI", value: "Teks + foto" },
+    transformEyebrow: "Sebelum dan sesudah",
+    transformTitle: "Dari sisa makanan jadi menu siap saji",
+    transformText: "FoodLoop mengubah bahan yang hampir terlupakan menjadi ide masakan yang jelas dan aman.",
+    checksSafety: "cek aman",
+    transforms: [
+      { before: "Nasi sisa + telur + sambal", after: "Nasi Goreng Kampung - 15 menit" },
+      { before: "Pisang matang + roti", after: "Roti Pisang Panggang - 10 menit" },
+      { before: "Sayur sisa + telur", after: "Omelet Sayur - 12 menit" },
     ],
-    mobilePills: ["Foto", "Teks", "Resep aman"],
-    featurePhoto: "Pilih foto leftover dari perangkat Anda.",
-    featureCamera: "Ambil foto makanan langsung dari halaman Analisis.",
-    featureText: "Jelaskan sisa makanan dengan teks saat foto belum cukup jelas.",
-    fitTitle: "Cocok untuk",
-    fitItems: ["Ibu rumah tangga", "Anak kos", "Warung kecil", "Orang yang sering punya nasi atau sayur sisa"],
-    beforeAfter: "Contoh: nasi sisa + telur + sambal -> nasi goreng kampung sekitar 15 menit.",
-    menuCards: [
-      { title: "Nasi sisa", items: ["Nasi goreng kampung", "Nasi telur sambal", "Perkedel nasi"] },
-      { title: "Lauk sisa", items: ["Ayam suwir pedas", "Tumis tahu tempe", "Isian omelet"] },
-      { title: "Sayur sisa", items: ["Sayur kuah", "Capcay cepat", "Campuran nasi goreng"] },
+    stepsEyebrow: "Alur sederhana",
+    stepsTitle: "Buka, masukkan makanan, lalu ikuti arahan",
+    stepsText: "Pengalaman dibuat untuk pengguna yang tidak ingin memikirkan istilah teknis.",
+    steps: [
+      { title: "Foto atau tulis", text: "Masukkan makanan dengan kamera, galeri, atau teks." },
+      { title: "Cek keamanan", text: "Jawab pertanyaan singkat soal waktu, penyimpanan, dan tanda basi." },
+      { title: "Pilih resep", text: "Lihat ide masakan Indonesia yang cocok dengan bahan Anda." },
+      { title: "Masak bertahap", text: "Ikuti langkah besar satu per satu sampai selesai." },
     ],
-    pdfText: "PDF yang dibuat berisi makanan terdeteksi, peringatan kesegaran, langkah resep Indonesia, panduan porsi, catatan penyimpanan, hal yang perlu dihindari, dan disclaimer keamanan.",
-    sliderEyebrow: "Ide resep",
-    sliderTitle: "Dari leftover jadi makanan siap saji",
-    sliderDescription: "Pratinjau otomatis ide yang bisa disarankan FoodLoop setelah cek keamanan.",
-    sliderGoTo: "Buka slide resep",
-    sliderRecipes: [
-      { name: "Nasi Goreng Kampung", badge: "Cocok untuk nasi", time: "15 menit", description: "Memakai nasi sisa, telur, sambal, dan sayur sederhana untuk menu rumah yang cepat." },
-      { name: "Tumis Tahu Tempe", badge: "Protein praktis", time: "20 menit", description: "Mengubah tahu atau tempe sisa menjadi lauk hangat dengan bumbu Indonesia." },
-      { name: "Roti Pisang Panggang", badge: "Opsi manis", time: "12 menit", description: "Ide camilan sederhana untuk roti dan pisang sisa sebelum terbuang." },
+    previewA: { eyebrow: "Input mudah", title: "FoodLoop membaca makanan Anda", text: "Ambil foto atau tulis bahan secara bebas. FoodLoop membantu mengenali bahan yang terlihat dan menyiapkan analisis." },
+    previewB: { eyebrow: "Safety first", title: "Cek keamanan sebelum memasak", text: "Sebelum menyarankan resep, FoodLoop meminta konfirmasi kondisi penting agar pengguna tidak asal mengolah makanan berisiko." },
+    previewC: { eyebrow: "Resep familiar", title: "Resep Indonesia yang masuk akal", text: "Kartu resep menonjolkan waktu, kesulitan, bahan yang dipakai, dan alasan singkat tanpa skor teknis." },
+    previewD: { eyebrow: "Saat memasak", title: "Masak langkah demi langkah", text: "Instruksi besar dan tombol jelas membantu pengguna mengikuti resep sambil berdiri di dapur." },
+    previewE: { eyebrow: "Tersimpan", title: "Riwayat dan ringkasan", text: "FoodLoop menyimpan analisis, resep yang dimulai, selesai, atau berhenti agar progres dapat dilihat lagi." },
+    photoMockup: "Foto makanan",
+    galleryMockup: "Pilih dari galeri",
+    textMockup: "Tulis sendiri",
+    useCaseEyebrow: "Untuk dapur Indonesia",
+    useCaseTitle: "Dibuat untuk kebutuhan sehari-hari",
+    useCaseText: "Bukan dashboard teknis. FoodLoop terasa seperti teman dapur yang praktis.",
+    useCases: [
+      { title: "Rumah tangga", text: "Bantu memakai nasi, lauk, dan sayur sisa dengan lebih aman." },
+      { title: "Anak kos", text: "Cari menu cepat dari bahan terbatas tanpa bingung." },
+      { title: "Warung kecil", text: "Pantau ide pemanfaatan bahan agar tidak cepat terbuang." },
+      { title: "Orang tua", text: "Instruksi besar, bahasa sederhana, dan keputusan keamanan jelas." },
     ],
+    finalTitle: "Punya sisa makanan sekarang?",
+    finalText: "Coba tulis atau foto makanan Anda. FoodLoop bantu cari ide yang aman dan mudah dimasak.",
+  },
+  en: {
+    heroPill: "Indonesian kitchen assistant",
+    heroTitle: "Leftovers become safer meals. In a few steps.",
+    heroSubtitle: "Take a photo or write what food you have. FoodLoop helps check safety, suggest Indonesian recipes, and guide cooking steps.",
+    primaryCta: "Start Now",
+    secondaryCta: "See How It Works",
+    trustLine: "Useful for households, students, small stalls, and older users.",
+    quickPlaceholder: "Example: leftover rice, egg, sambal...",
+    quickButton: "Find ideas",
+    valueCards: [
+      { icon: sharedIcons[0], title: "Photo or simple text", text: "No complicated format. Use a photo or everyday language." },
+      { icon: sharedIcons[1], title: "Safety first", text: "FoodLoop reminds users about smell, slime, mold, room temperature, and storage." },
+      { icon: sharedIcons[2], title: "Indonesian recipes", text: "Suggestions focus on familiar meals like fried rice, omelets, fritters, and stir-fries." },
+    ],
+    transformEyebrow: "Before and after",
+    transformTitle: "From leftovers to ready meals",
+    transformText: "FoodLoop turns nearly forgotten ingredients into clear, safer cooking ideas.",
+    checksSafety: "safety check",
+    transforms: [
+      { before: "Leftover rice + egg + sambal", after: "Nasi Goreng Kampung - 15 min" },
+      { before: "Ripe banana + bread", after: "Banana Toast - 10 min" },
+      { before: "Vegetables + egg", after: "Vegetable Omelet - 12 min" },
+    ],
+    stepsEyebrow: "Simple flow",
+    stepsTitle: "Open, enter food, then follow guidance",
+    stepsText: "The experience avoids technical words and keeps one clear next action.",
+    steps: [
+      { title: "Photo or write", text: "Use camera, gallery, or text." },
+      { title: "Check safety", text: "Answer short questions about time, storage, and spoilage signs." },
+      { title: "Pick recipe", text: "See Indonesian meal ideas that fit your ingredients." },
+      { title: "Cook step by step", text: "Follow large instructions one at a time." },
+    ],
+    previewA: { eyebrow: "Easy input", title: "FoodLoop reads your food", text: "Take a photo or write freely. FoodLoop helps identify visible ingredients and prepare analysis." },
+    previewB: { eyebrow: "Safety first", title: "Check safety before cooking", text: "FoodLoop asks for important condition checks before suggesting a recipe." },
+    previewC: { eyebrow: "Familiar recipes", title: "Indonesian recipes that make sense", text: "Recipe cards show time, difficulty, ingredients used, and a short reason without technical scores." },
+    previewD: { eyebrow: "While cooking", title: "Cook step by step", text: "Large instructions and clear buttons help users follow the recipe in the kitchen." },
+    previewE: { eyebrow: "Saved progress", title: "History and summary", text: "FoodLoop saves analyses and cooking sessions so progress can be revisited." },
+    photoMockup: "Take a photo",
+    galleryMockup: "Choose from gallery",
+    textMockup: "Write it yourself",
+    useCaseEyebrow: "For Indonesian kitchens",
+    useCaseTitle: "Built for everyday use",
+    useCaseText: "Not a technical dashboard. FoodLoop feels like a practical kitchen companion.",
+    useCases: [
+      { title: "Households", text: "Reuse leftover rice, dishes, and vegetables more safely." },
+      { title: "Students", text: "Find quick meals from limited ingredients." },
+      { title: "Small stalls", text: "Track ideas for ingredients before they go to waste." },
+      { title: "Older users", text: "Large instructions, simple language, and clear safety decisions." },
+    ],
+    finalTitle: "Have leftovers right now?",
+    finalText: "Try writing or photographing your food. FoodLoop will help find safer, easy cooking ideas.",
   },
 };
-
-function Feature({ icon: Icon, title, text }) {
-  return (
-    <div>
-      <span className="grid h-11 w-11 place-items-center rounded-lg bg-forest-50 text-forest-700">
-        <Icon size={22} />
-      </span>
-      <h2 className="mt-4 text-lg font-bold text-forest-900">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-ink/65">{text}</p>
-    </div>
-  );
-}
-
-function HeroDish({ name, meta, badge }) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-white/10 p-3">
-      <div>
-        <p className="font-bold text-white">{name}</p>
-        <p className="mt-1 text-sm text-white/60">{meta}</p>
-      </div>
-      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-forest-900">{badge}</span>
-    </div>
-  );
-}
-
-function MetricCard({ icon: Icon, label, value }) {
-  return (
-    <div className="rounded-lg border border-forest-900/10 bg-white p-4 shadow-soft">
-      <span className="grid h-10 w-10 place-items-center rounded-lg bg-forest-50 text-forest-700">
-        <Icon size={20} />
-      </span>
-      <p className="mt-3 text-sm text-ink/60">{label}</p>
-      <p className="mt-1 font-bold text-forest-900">{value}</p>
-    </div>
-  );
-}
-
-function MenuCard({ title, items }) {
-  return (
-    <div className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
-      <h2 className="font-bold text-forest-900">{title}</h2>
-      <div className="mt-4 space-y-2">
-        {items.map((item) => (
-          <div key={item} className="flex items-center justify-between rounded-lg bg-earth-50 px-3 py-2 text-sm">
-            <span className="font-medium text-ink/75">{item}</span>
-            <ChevronRight size={16} className="text-forest-700" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}

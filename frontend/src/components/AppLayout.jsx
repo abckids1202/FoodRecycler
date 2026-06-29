@@ -15,16 +15,16 @@ export default function AppLayout({ children }) {
 
   const navLinks = [
     { to: "/", label: t.navHome },
-    { to: "/upload", label: t.navStart },
+    { to: "/start", label: t.navStart },
     { to: "/history", label: t.navHistory },
-    { to: "/chat", label: t.navHelp },
+    { to: "/help", label: t.navHelp },
     ...(isAdmin ? [{ to: "/admin", label: t.navAdmin }] : []),
   ];
   const bottomLinks = [
     { to: "/", label: t.navHome, icon: Home },
-    { to: "/upload", label: t.navStart, icon: ChefHat },
+    { to: "/start", label: t.navStart, icon: ChefHat },
     { to: "/history", label: t.navHistory, icon: History },
-    { to: "/chat", label: t.navHelp, icon: Bot },
+    { to: "/help", label: t.navHelp, icon: Bot },
   ];
 
   return (
@@ -32,7 +32,7 @@ export default function AppLayout({ children }) {
       <header className="sticky top-0 z-40 border-b border-forest-900/10 bg-earth-50/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-forest-900 text-xs font-black text-white sm:h-10 sm:w-10 sm:text-sm">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-forest-900 text-xs font-black text-white sm:h-10 sm:w-10 sm:text-sm">
               FL
             </span>
             <span className="min-w-0">
@@ -48,7 +48,7 @@ export default function AppLayout({ children }) {
                 to={item.to}
                 className={({ isActive }) =>
                   [
-                    "focus-ring rounded-lg px-3 py-2 text-sm font-semibold transition",
+                    "focus-ring rounded-2xl px-3 py-2 text-sm font-semibold transition",
                     isActive ? "bg-forest-900 text-white" : "text-ink/70 hover:bg-white hover:text-forest-900",
                   ].join(" ")
                 }

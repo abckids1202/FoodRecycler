@@ -16,6 +16,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-size: 16px;
 }
 
 button,
@@ -27,4 +28,9 @@ textarea {
 
 .focus-ring {
   @apply focus:outline-none focus:ring-2 focus:ring-forest-500 focus:ring-offset-2 focus:ring-offset-earth-50;
+}
+
+::selection {
+  background: #f7d774;
+  color: #092e22;
 }
