@@ -6,7 +6,7 @@ import LoadingState from "../components/LoadingState.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import RecommendationCard from "../components/RecommendationCard.jsx";
 import { generatePdf } from "../api/pdfApi";
-import { getRecommendations } from "../api/recipeApi";
+import { getRecommendations, recommendRecipes } from "../api/recipeApi";
 import { useApp } from "../context/AppContext.jsx";
 
 export default function RecipeRecommendations() {
@@ -24,7 +24,10 @@ export default function RecipeRecommendations() {
       setStatus("loading");
       setError("");
       try {
-        const result = await getRecommendations(batchId);
+        let result = await getRecommendations(batchId);
+        if (!result.recommendations?.length) {
+          result = await recommendRecipes(batchId);
+        }
         if (!isMounted) return;
         setRecommendations(result.recommendations || []);
         setStatus("ready");
@@ -49,7 +52,7 @@ export default function RecipeRecommendations() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={`Batch ${batchId}`}
+        eyebrow={copy.eyebrow}
         title={copy.title}
         description={copy.description}
       />
@@ -79,21 +82,23 @@ export default function RecipeRecommendations() {
 
 const recommendationCopy = {
   en: {
-    title: "Recipe recommendations",
-    description: "Recommendations are ranked by food safety rules, leftover condition, contamination risk, and detector confidence.",
-    loadingTitle: "Loading recommendations",
-    loadingMessage: "Reading recipe matches from the backend.",
-    errorTitle: "Recommendation backend error",
-    emptyTitle: "No recipe matches yet",
-    emptyMessage: "Try describing the leftover with more food names, or add more recipes to the JSON file.",
+    eyebrow: "Recipe ideas",
+    title: "Meals you can make",
+    description: "Choose the recipe that feels easiest and safest for the ingredients you have.",
+    loadingTitle: "Finding recipe ideas",
+    loadingMessage: "FoodLoop is matching your leftovers with Indonesian recipes.",
+    errorTitle: "Could not load recipes",
+    emptyTitle: "No recipe is safe to suggest yet",
+    emptyMessage: "Try adding clearer ingredient names such as rice, egg, chicken, tofu, tempeh, sambal, vegetables, bread, or banana.",
   },
   id: {
-    title: "Rekomendasi resep",
-    description: "Rekomendasi diurutkan berdasarkan aturan keamanan, kondisi leftover, risiko kontaminasi, dan keyakinan deteksi.",
-    loadingTitle: "Memuat rekomendasi",
-    loadingMessage: "Mengambil kecocokan resep dari backend.",
-    errorTitle: "Error backend rekomendasi",
-    emptyTitle: "Belum ada resep yang cocok",
-    emptyMessage: "Coba jelaskan leftover dengan nama bahan yang lebih lengkap, atau tambahkan resep ke file JSON.",
+    eyebrow: "Ide resep",
+    title: "Masakan yang bisa dibuat",
+    description: "Pilih resep yang terasa paling mudah dan aman untuk bahan yang Anda punya.",
+    loadingTitle: "Mencari ide resep",
+    loadingMessage: "FoodLoop sedang mencocokkan leftover dengan resep Indonesia.",
+    errorTitle: "Resep belum bisa dimuat",
+    emptyTitle: "Belum ada resep yang aman disarankan",
+    emptyMessage: "Coba tambahkan nama bahan yang lebih jelas, misalnya nasi, telur, ayam, tahu, tempe, sambal, sayur, roti, atau pisang.",
   },
 };

@@ -13,6 +13,15 @@ export async function uploadWasteImage({ file, userId, condition, clarification 
   return response.data;
 }
 
+export async function analyzeWasteText({ text, userId, condition = "unknown" }) {
+  const response = await apiClient.post("/api/analysis/text", {
+    text,
+    user_id: userId,
+    condition,
+  });
+  return response.data;
+}
+
 export async function analyzeWasteBatch(batchId) {
   const response = await apiClient.get(`/api/analysis/${batchId}`);
   return response.data;

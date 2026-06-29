@@ -1,13 +1,21 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
 from app.database.models import Analysis, FoodRecipe, Recommendation
+from app.services.label_normalizer import keyword_map
+from app.services.recipe_loader import seed_recipes_from_json
 
 
 def recommend_for_analysis(db: Session, analysis: Analysis) -> list[Recommendation]:
-    detected_labels = {item.label for item in analysis.items if not item.is_safety_flag}
+    detected_labels = _normalized_analysis_labels(analysis)
     db.query(Recommendation).filter(Recommendation.analysis_id == analysis.id).delete()
 
     recipes = db.query(FoodRecipe).all()
+    if not recipes:
+        seed_recipes_from_json(db)
+        recipes = db.query(FoodRecipe).all()
+
     recommendations = []
 
     for recipe in recipes:
@@ -43,6 +51,7 @@ def recommend_for_analysis(db: Session, analysis: Analysis) -> list[Recommendati
         )
 
     recommendations.sort(key=lambda item: item.score, reverse=True)
+    recommendations = recommendations[:8]
     for item in recommendations:
         db.add(item)
     db.commit()
@@ -50,3 +59,57 @@ def recommend_for_analysis(db: Session, analysis: Analysis) -> list[Recommendati
     for item in recommendations:
         db.refresh(item)
     return recommendations
+
+
+def _normalized_analysis_labels(analysis: Analysis) -> set[str]:
+    labels = set()
+    for item in analysis.items:
+        if item.is_safety_flag:
+            continue
+        labels.update(_labels_from_text(item.label))
+        labels.update(_labels_from_text(item.display_name))
+
+    if analysis.source_text:
+        labels.update(_labels_from_text(analysis.source_text))
+
+    labels.discard("unknown_food_leftover")
+    return labels
+
+
+def _labels_from_text(value: Optional[str]) -> set[str]:
+    if not value:
+        return set()
+
+    text = value.strip().lower().replace("-", "_").replace(" ", "_")
+    labels = {text}
+
+    readable = value.strip().lower().replace("_", " ")
+    for keyword, (label, _) in keyword_map.items():
+        normalized_keyword = keyword.lower().replace("_", " ")
+        if normalized_keyword in readable or normalized_keyword.replace(" ", "_") in text:
+            labels.add(label)
+
+    aliases = {
+        "cooked rice": "cooked_rice",
+        "leftover rice": "cooked_rice",
+        "nasi putih": "cooked_rice",
+        "nasi matang": "cooked_rice",
+        "nasi sisa": "cooked_rice",
+        "eggs": "egg",
+        "ayam goreng": "chicken_leftover",
+        "ayam sisa": "chicken_leftover",
+        "sayur sisa": "vegetable_leftover",
+        "leftover vegetables": "vegetable_leftover",
+        "ketchup": "sambal",
+        "saus": "sambal",
+        "saus sambal": "sambal",
+        "tempe sisa": "tempeh_leftover",
+        "tahu sisa": "tofu_leftover",
+        "roti sisa": "bread_leftover",
+        "pisang matang": "banana_overripe",
+    }
+    for alias, label in aliases.items():
+        if alias in readable:
+            labels.add(label)
+
+    return labels

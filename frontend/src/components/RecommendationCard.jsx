@@ -27,9 +27,9 @@ export default function RecommendationCard({ recommendation, rank = 0, language 
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-sm lg:grid-cols-1">
-          <Metric icon={Gauge} label={copy.score} value={recommendation.score} />
+          <Metric icon={Gauge} label={copy.match} value={rank === 0 ? copy.bestShort : copy.goodFit} />
           <Metric icon={Clock} label={copy.time} value={recommendation.estimated_time || copy.defaultTime} />
-          <Metric icon={ShieldCheck} label={copy.safety} value={recommendation.safety_level || copy.checked} />
+          <Metric icon={ShieldCheck} label={copy.safety} value={formatSafety(recommendation.safety_level, copy)} />
         </div>
 
         <div className="flex flex-wrap gap-2 lg:justify-end">
@@ -84,12 +84,17 @@ function getBadges(recommendation, rank, copy) {
 
 const cardCopy = {
   en: {
-    score: "Score",
+    match: "Fit",
     time: "Time",
     safety: "Safety",
     preview: "Preview",
     defaultTime: "10-35 min",
     checked: "checked",
+    bestShort: "Best fit",
+    goodFit: "Good fit",
+    safeNormal: "Check first",
+    safeModified: "Cook again",
+    unsafe: "Do not use",
     best: "Best recommendation",
     practical: "Practical",
     fastest: "Fastest recipe",
@@ -97,12 +102,17 @@ const cardCopy = {
     reasonFallback: (name) => `Matched leftovers with ${name}. Confirm freshness and storage before cooking.`,
   },
   id: {
-    score: "Skor",
+    match: "Kecocokan",
     time: "Waktu",
     safety: "Keamanan",
     preview: "Lihat resep",
     defaultTime: "10-35 menit",
     checked: "sudah dicek",
+    bestShort: "Paling cocok",
+    goodFit: "Cocok",
+    safeNormal: "Cek dulu",
+    safeModified: "Masak ulang",
+    unsafe: "Jangan pakai",
     best: "Rekomendasi terbaik",
     practical: "Praktis",
     fastest: "Resep tercepat",
@@ -110,3 +120,11 @@ const cardCopy = {
     reasonFallback: (name) => `Leftover cocok untuk ${name}. Pastikan kesegaran dan penyimpanan aman sebelum memasak.`,
   },
 };
+
+function formatSafety(value, copy) {
+  const safety = String(value || "").toLowerCase();
+  if (safety.includes("not_safe")) return copy.unsafe;
+  if (safety.includes("eligible") || safety.includes("modified")) return copy.safeModified;
+  if (safety.includes("review")) return copy.safeNormal;
+  return copy.checked;
+}

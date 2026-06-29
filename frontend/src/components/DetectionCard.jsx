@@ -1,4 +1,4 @@
-import { formatConfidence, formatPercent, titleCase } from "../utils/formatters";
+import { titleCase } from "../utils/formatters";
 import { useApp } from "../context/AppContext.jsx";
 
 export default function DetectionCard({ item }) {
@@ -10,7 +10,7 @@ export default function DetectionCard({ item }) {
         <div>
           <p className="font-semibold text-forest-900">{titleCase(item.label)}</p>
           <p className="mt-1 text-sm text-ink/60">
-            {copy.confidence} {formatConfidence(item.confidence)} / {copy.area} {formatPercent(item.estimated_area_percent)}
+            {statusLabel(item.confidence, copy)}
           </p>
         </div>
         {item.is_contaminant && (
@@ -23,13 +23,21 @@ export default function DetectionCard({ item }) {
 
 const detectionCopy = {
   en: {
-    confidence: "Confidence",
-    area: "Area",
+    clear: "Looks clear",
+    check: "Please check",
+    unsure: "May be wrong",
     contaminant: "Contaminant",
   },
   id: {
-    confidence: "Keyakinan",
-    area: "Area",
+    clear: "Terlihat jelas",
+    check: "Perlu dicek",
+    unsure: "Mungkin salah",
     contaminant: "Kontaminan",
   },
 };
+
+function statusLabel(confidence = 0.5, copy) {
+  if (confidence >= 0.78) return copy.clear;
+  if (confidence >= 0.5) return copy.check;
+  return copy.unsure;
+}

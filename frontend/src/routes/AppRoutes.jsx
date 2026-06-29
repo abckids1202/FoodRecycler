@@ -28,6 +28,7 @@ export default function AppRoutes() {
             <AppLayout>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/start" element={<Navigate to="/upload" replace />} />
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/camera" element={<Navigate to="/upload" replace />} />
                 <Route path="/chat" element={<ChatHelper />} />

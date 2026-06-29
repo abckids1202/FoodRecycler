@@ -78,7 +78,7 @@ export default function AdminPanel() {
               <h2 className="flex items-center gap-2 text-lg font-bold">
                 <Shield size={20} /> {copy.privacyTitle}
               </h2>
-              <p className="mt-3 text-sm leading-6 text-white/70">{data.privacy_note}</p>
+              <p className="mt-3 text-sm leading-6 text-white/70">{copy.privacyNote}</p>
               <div className="mt-5 rounded-lg bg-white/10 p-4">
                 <p className="text-sm text-white/65">{copy.reactivation}</p>
                 <p className="mt-1 text-3xl font-black">{data.reminder_reactivation_rate}%</p>
@@ -141,6 +141,8 @@ const adminCopy = {
     metricHint: "All users",
     recentUsers: "Recent users",
     privacyTitle: "Privacy guard",
+    privacyNote:
+      "Admin data is limited to product analytics fields. Do not expose OpenAI keys, Google secrets, passwords, or raw private messages.",
     reactivation: "Reminder reactivation rate",
     safetyEyebrow: "Transparency",
     safetyTitle: "Data safety and responsible-use statement",
@@ -178,6 +180,8 @@ const adminCopy = {
     metricHint: "Semua user",
     recentUsers: "User terbaru",
     privacyTitle: "Penjaga privasi",
+    privacyNote:
+      "Data admin dibatasi pada analitik produk. Jangan tampilkan kunci OpenAI, rahasia Google, kata sandi, atau pesan pribadi mentah.",
     reactivation: "Tingkat reaktivasi pengingat",
     safetyEyebrow: "Transparansi",
     safetyTitle: "Pernyataan keamanan data dan penggunaan bertanggung jawab",

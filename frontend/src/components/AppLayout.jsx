@@ -1,4 +1,4 @@
-import { Menu, X } from "lucide-react";
+import { Bot, ChefHat, History, Home, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useApp } from "../context/AppContext.jsx";
@@ -15,16 +15,20 @@ export default function AppLayout({ children }) {
 
   const navLinks = [
     { to: "/", label: t.navHome },
-    { to: "/upload", label: t.navAnalyze },
-    { to: "/chat", label: t.navAssistant },
+    { to: "/upload", label: t.navStart },
     { to: "/history", label: t.navHistory },
-    { to: "/dashboard", label: t.navDashboard },
-    { to: "/reminders", label: t.navReminders },
+    { to: "/chat", label: t.navHelp },
     ...(isAdmin ? [{ to: "/admin", label: t.navAdmin }] : []),
+  ];
+  const bottomLinks = [
+    { to: "/", label: t.navHome, icon: Home },
+    { to: "/upload", label: t.navStart, icon: ChefHat },
+    { to: "/history", label: t.navHistory, icon: History },
+    { to: "/chat", label: t.navHelp, icon: Bot },
   ];
 
   return (
-    <div className="min-h-screen bg-earth-50 text-ink">
+    <div className="min-h-screen bg-earth-50 pb-20 text-ink md:pb-0">
       <header className="sticky top-0 z-40 border-b border-forest-900/10 bg-earth-50/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -123,6 +127,25 @@ export default function AppLayout({ children }) {
           </div>
         </div>
       </footer>
+      <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-forest-900/10 bg-white/95 px-2 py-2 shadow-[0_-10px_30px_rgba(16,48,32,0.10)] backdrop-blur md:hidden">
+        <div className="mx-auto grid max-w-lg grid-cols-4 gap-1">
+          {bottomLinks.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                [
+                  "focus-ring flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg text-xs font-bold transition",
+                  isActive ? "bg-forest-900 text-white" : "text-ink/65 hover:bg-forest-50 hover:text-forest-900",
+                ].join(" ")
+              }
+            >
+              <item.icon size={19} />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
+      </nav>
       <FeedbackPrompt />
     </div>
   );
@@ -130,14 +153,14 @@ export default function AppLayout({ children }) {
 
 const footerCopy = {
   en: {
-    description: "Indonesian leftover assistant for safer reuse, recipe ideas, and cooking progress tracking.",
+    description: "A friendly Indonesian leftover assistant for safer reuse, recipe ideas, and cooking progress tracking.",
     safetyTitle: "Safety notice",
     safetyText: "AI can make mistakes. Always check smell, texture, storage time, allergies, and reheating safety before eating leftovers.",
     legalTitle: "Privacy & demo use",
     legalText: "This prototype stores basic profile, analysis, cooking, and feedback data for product testing. Do not use it as medical advice.",
   },
   id: {
-    description: "Asisten leftover Indonesia untuk pemanfaatan lebih aman, ide resep, dan pelacakan progres memasak.",
+    description: "Asisten sisa makanan Indonesia untuk pemanfaatan lebih aman, ide resep, dan pelacakan progres memasak.",
     safetyTitle: "Catatan keamanan",
     safetyText: "AI bisa keliru. Selalu cek bau, tekstur, waktu penyimpanan, alergi, dan keamanan pemanasan ulang sebelum makan leftover.",
     legalTitle: "Privasi & penggunaan demo",

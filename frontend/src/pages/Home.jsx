@@ -1,4 +1,4 @@
-import { BarChart3, Bot, Camera, ChevronRight, Clock, FileText, Search, ShieldCheck, Sparkles, Upload, Utensils } from "lucide-react";
+import { Bot, Camera, ChevronRight, Clock, FileText, Search, ShieldCheck, Sparkles, Upload, Utensils } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../components/Button.jsx";
@@ -41,11 +41,8 @@ export default function Home() {
               <Button as={Link} to="/upload" className="w-full bg-earth-500 text-white shadow-lg shadow-black/10 hover:bg-earth-500/90 sm:w-auto">
                 <Upload size={17} /> {t.analyzeLeftovers}
               </Button>
-              <Button as={Link} to="/chat" variant="secondary" className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto">
-                <Bot size={17} /> {t.askAssistant}
-              </Button>
-              <Button as={Link} to="/dashboard" variant="secondary" className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto">
-                <BarChart3 size={17} /> {t.viewDashboard}
+              <Button as="a" href="#contoh" variant="secondary" className="w-full border-white/20 bg-white/10 text-white hover:bg-white/15 sm:w-auto">
+                <Bot size={17} /> {copy.exampleButton}
               </Button>
             </div>
             <div className="mt-5 grid grid-cols-3 gap-2 sm:hidden">
@@ -68,7 +65,7 @@ export default function Home() {
               <p className="text-sm font-semibold text-forest-100">{copy.popularTitle}</p>
               <div className="mt-4 space-y-3">
                 {copy.heroDishes.map((dish) => (
-                  <HeroDish key={dish.name} name={dish.name} meta={dish.meta} score={dish.score} />
+                  <HeroDish key={dish.name} name={dish.name} meta={dish.meta} badge={dish.badge} />
                 ))}
               </div>
             </div>
@@ -76,7 +73,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-forest-900/10 bg-white shadow-soft">
+      <section id="contoh" className="overflow-hidden rounded-lg border border-forest-900/10 bg-white shadow-soft">
         <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[280px_1fr] lg:items-center">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-forest-700">{copy.sliderEyebrow}</p>
@@ -157,6 +154,18 @@ export default function Home() {
         ))}
       </section>
 
+      <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
+        <h2 className="text-xl font-bold text-forest-900">{copy.fitTitle}</h2>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {copy.fitItems.map((item) => (
+            <div key={item} className="rounded-lg bg-forest-50 px-4 py-3 text-sm font-bold text-forest-900">
+              {item}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 rounded-lg bg-earth-50 px-4 py-3 text-sm font-semibold text-ink/75">{copy.beforeAfter}</p>
+      </section>
+
       <section className="rounded-lg border border-forest-900/10 bg-white p-6 shadow-soft">
         <div className="flex items-start gap-4">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-forest-50 text-forest-700">
@@ -176,15 +185,16 @@ export default function Home() {
 
 const homeCopy = {
   en: {
+    exampleButton: "See Example",
     searchPlaceholder: "Example: leftover rice, eggs, sambal, fried chicken...",
-    popularTitle: "Popular recommendations",
+    popularTitle: "Often-used ideas",
     heroDishes: [
-      { name: "Nasi Goreng Kampung", meta: "Rice + egg + sambal", score: "92" },
-      { name: "Nasi Telur Sambal", meta: "Fast breakfast idea", score: "88" },
-      { name: "Perkedel Nasi", meta: "Turn rice into a side dish", score: "76" },
+      { name: "Nasi Goreng Kampung", meta: "Rice + egg + sambal", badge: "15 min" },
+      { name: "Nasi Telur Sambal", meta: "Fast breakfast idea", badge: "Easy" },
+      { name: "Perkedel Nasi", meta: "Turn rice into a side dish", badge: "Practical" },
     ],
     metrics: [
-      { icon: Utensils, label: "Indonesian menu", value: "Curated JSON" },
+      { icon: Utensils, label: "Indonesian menu", value: "Familiar food" },
       { icon: ShieldCheck, label: "Safety-first", value: "Condition check" },
       { icon: Clock, label: "Fast cooking", value: "10-30 min" },
       { icon: Sparkles, label: "AI helper", value: "Text + vision" },
@@ -193,6 +203,9 @@ const homeCopy = {
     featurePhoto: "Pick a leftover photo from your device.",
     featureCamera: "Capture food directly on the Analyze page.",
     featureText: "Describe the leftovers when a photo is not enough.",
+    fitTitle: "Useful for",
+    fitItems: ["Families at home", "Students", "Small food stalls", "Anyone with leftover rice or vegetables"],
+    beforeAfter: "Example: leftover rice + egg + sambal -> nasi goreng kampung in about 15 minutes.",
     menuCards: [
       { title: "Leftover rice", items: ["Village fried rice", "Rice with egg and sambal", "Rice fritters"] },
       { title: "Leftover proteins", items: ["Spicy shredded chicken", "Sauteed tofu and tempeh", "Omelet filling"] },
@@ -210,15 +223,16 @@ const homeCopy = {
     ],
   },
   id: {
+    exampleButton: "Lihat Contoh",
     searchPlaceholder: "Contoh: nasi sisa, telur, sambal, ayam goreng...",
-    popularTitle: "Rekomendasi populer",
+    popularTitle: "Ide yang sering dipakai",
     heroDishes: [
-      { name: "Nasi Goreng Kampung", meta: "Nasi + telur + sambal", score: "92" },
-      { name: "Nasi Telur Sambal", meta: "Cepat untuk sarapan", score: "88" },
-      { name: "Perkedel Nasi", meta: "Ubah nasi jadi lauk", score: "76" },
+      { name: "Nasi Goreng Kampung", meta: "Nasi + telur + sambal", badge: "15 menit" },
+      { name: "Nasi Telur Sambal", meta: "Cepat untuk sarapan", badge: "Mudah" },
+      { name: "Perkedel Nasi", meta: "Ubah nasi jadi lauk", badge: "Praktis" },
     ],
     metrics: [
-      { icon: Utensils, label: "Menu Indonesia", value: "JSON terkurasi" },
+      { icon: Utensils, label: "Menu Indonesia", value: "Masakan familiar" },
       { icon: ShieldCheck, label: "Utamakan aman", value: "Cek kondisi" },
       { icon: Clock, label: "Masak cepat", value: "10-30 menit" },
       { icon: Sparkles, label: "Asisten AI", value: "Teks + foto" },
@@ -226,7 +240,10 @@ const homeCopy = {
     mobilePills: ["Foto", "Teks", "Resep aman"],
     featurePhoto: "Pilih foto leftover dari perangkat Anda.",
     featureCamera: "Ambil foto makanan langsung dari halaman Analisis.",
-    featureText: "Jelaskan leftover dengan teks saat foto belum cukup jelas.",
+    featureText: "Jelaskan sisa makanan dengan teks saat foto belum cukup jelas.",
+    fitTitle: "Cocok untuk",
+    fitItems: ["Ibu rumah tangga", "Anak kos", "Warung kecil", "Orang yang sering punya nasi atau sayur sisa"],
+    beforeAfter: "Contoh: nasi sisa + telur + sambal -> nasi goreng kampung sekitar 15 menit.",
     menuCards: [
       { title: "Nasi sisa", items: ["Nasi goreng kampung", "Nasi telur sambal", "Perkedel nasi"] },
       { title: "Lauk sisa", items: ["Ayam suwir pedas", "Tumis tahu tempe", "Isian omelet"] },
@@ -257,14 +274,14 @@ function Feature({ icon: Icon, title, text }) {
   );
 }
 
-function HeroDish({ name, meta, score }) {
+function HeroDish({ name, meta, badge }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg bg-white/10 p-3">
       <div>
         <p className="font-bold text-white">{name}</p>
         <p className="mt-1 text-sm text-white/60">{meta}</p>
       </div>
-      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-forest-900">{score}</span>
+      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-forest-900">{badge}</span>
     </div>
   );
 }

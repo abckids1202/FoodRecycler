@@ -7,7 +7,7 @@ import ImagePreview from "../components/ImagePreview.jsx";
 import LoadingState from "../components/LoadingState.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import UploadBox from "../components/UploadBox.jsx";
-import { uploadWasteImage } from "../api/wasteApi";
+import { analyzeWasteText, uploadWasteImage } from "../api/wasteApi";
 import { useApp } from "../context/AppContext.jsx";
 import { dataUrlToFile, fileToPreviewUrl } from "../utils/fileHelpers";
 
@@ -79,15 +79,29 @@ export default function Upload() {
   }
 
   function handleAssistantSubmit() {
+    return handleTextAnalyze();
+  }
+
+  async function handleTextAnalyze() {
     const trimmed = assistantText.trim();
     if (!trimmed) return;
-    navigate("/chat", { state: { initialPrompt: trimmed } });
+    setStatus("loading");
+    setError(null);
+
+    try {
+      const result = await analyzeWasteText({ text: trimmed, userId: user?.id, condition });
+      const batchId = result.batch_id || result.id;
+      navigate(`/analysis/${batchId}`);
+    } catch (requestError) {
+      setError(requestError.response?.data?.detail || requestError.message);
+      setStatus("error");
+    }
   }
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={t.navAnalyze}
+        eyebrow={copy.eyebrow}
         title={t.analyzeTitle}
         description={t.analyzeDescription}
       />
@@ -161,7 +175,7 @@ export default function Upload() {
             </section>
           )}
 
-          {inputMode !== "text" && <ConditionSelect value={condition} onChange={setCondition} t={t} />}
+          <ConditionSelect value={condition} onChange={setCondition} t={t} copy={copy} />
 
           {inputMode !== "text" && (
             <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
@@ -196,30 +210,34 @@ export default function Upload() {
 
 const uploadCopy = {
   en: {
+    eyebrow: "Start",
     flow: [
-      { title: "Enter food details", text: "Choose a photo, camera, or written leftover description." },
-      { title: "Check safety", text: "Food condition helps FoodLoop choose safety-first suggestions." },
-      { title: "Get menu ideas", text: "OpenAI matches the input with Indonesian food data." },
+      { title: "Enter food", text: "Use a photo, camera, or a simple written description." },
+      { title: "Check safety", text: "Tell FoodLoop the general condition before recipes appear." },
+      { title: "Pick a recipe", text: "Choose a practical Indonesian recipe and start cooking." },
     ],
     textChips: ["Food type", "When it was cooked", "Allergy/servings/time"],
     clarifyLabel: "Clarify visible leftovers",
     clarifyPlaceholder: "Optional: white rice, fried chicken, sambal, stir-fried vegetables. Stored in the fridge since last night, 2 portions.",
-    loadingTitle: "Analyzing image",
-    loadingMessage: "Uploading, storing, and running food detection.",
+    loadingTitle: "Checking your food",
+    loadingMessage: "FoodLoop is reading the input and finding safe recipe ideas.",
     cameraDenied: "Camera permission was denied.",
+    conditionHelp: "Choose the closest condition. If unsure, pick Not sure.",
   },
   id: {
+    eyebrow: "Mulai",
     flow: [
-      { title: "Masukkan data", text: "Pilih foto, kamera, atau tulis detail leftover." },
-      { title: "Cek keamanan", text: "Kondisi makanan dipakai untuk saran yang mengutamakan keamanan." },
-      { title: "Dapat ide menu", text: "OpenAI mencocokkan input dengan data makanan Indonesia." },
+      { title: "Masukkan makanan", text: "Gunakan foto, kamera, atau tulis dengan kalimat sederhana." },
+      { title: "Cek keamanan", text: "Pilih kondisi umum agar saran resep tetap aman." },
+      { title: "Pilih resep", text: "Pilih ide masakan Indonesia yang paling cocok." },
     ],
     textChips: ["Jenis makanan", "Kapan dimasak", "Alergi/porsi/waktu"],
     clarifyLabel: "Perjelas leftover yang terlihat",
     clarifyPlaceholder: "Opsional: nasi putih, ayam goreng, sambal, sayur tumis. Disimpan di kulkas sejak tadi malam, 2 porsi.",
-    loadingTitle: "Menganalisis gambar",
-    loadingMessage: "Mengunggah, menyimpan, dan menjalankan deteksi makanan.",
+    loadingTitle: "Mengecek makanan",
+    loadingMessage: "FoodLoop sedang membaca input dan mencari ide resep yang aman.",
     cameraDenied: "Izin kamera ditolak.",
+    conditionHelp: "Pilih kondisi yang paling mendekati. Kalau ragu, pilih Tidak yakin.",
   },
 };
 
@@ -239,14 +257,15 @@ function ModeButton({ active, onClick, icon: Icon, label }) {
   );
 }
 
-function ConditionSelect({ value, onChange, t }) {
+function ConditionSelect({ value, onChange, t, copy }) {
   return (
     <label className="block rounded-lg border border-forest-900/10 bg-white p-5 text-sm font-semibold text-forest-900 shadow-soft">
       {t.leftoverCondition}
+      <span className="mt-1 block text-sm font-normal leading-6 text-ink/60">{copy.conditionHelp}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="focus-ring mt-2 w-full rounded-lg border border-forest-900/10 bg-earth-50 px-3 py-2"
+        className="focus-ring mt-3 min-h-12 w-full rounded-lg border border-forest-900/10 bg-earth-50 px-3 py-2"
       >
         <option value="fresh">{t.conditionFresh}</option>
         <option value="normal">{t.conditionNormal}</option>
