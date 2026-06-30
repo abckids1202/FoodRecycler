@@ -285,7 +285,7 @@ export default function Start() {
         </div>
 
         <aside className="space-y-4">
-          <ImagePreview src={selectedImageUrl} />
+          {method !== "text" && <ImagePreview src={selectedImageUrl} />}
           <Card className="p-5">
             <h2 className="text-xl font-black text-forest-900">{copy.sideTitle}</h2>
             <div className="mt-4 space-y-3">

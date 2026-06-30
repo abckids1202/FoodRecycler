@@ -18,6 +18,7 @@ const itemTranslations = {
 
 const safetyLabels = {
   eligible_with_fresh: { en: "Eligible if fresh", id: "Layak jika bahan segar" },
+  eligible_with_freshness_check: { en: "Eligible after freshness check", id: "Layak setelah cek kesegaran" },
   needs_review: { en: "Needs review", id: "Perlu dikonfirmasi" },
   needs_user_review: { en: "Needs review", id: "Perlu dikonfirmasi" },
   not_safe_for_edible_reuse: { en: "Do not consume", id: "Jangan dikonsumsi" },
@@ -43,6 +44,8 @@ const exactNoteTranslations = {
   "heat until steaming hot": "Panaskan hingga benar-benar panas dan beruap.",
   "cook until fully set.": "Masak hingga matang sempurna.",
   "cook until fully set": "Masak hingga matang sempurna.",
+  "check all leftovers for safe storage and spoilage signs.": "Periksa semua leftover: pastikan penyimpanan aman dan tidak ada tanda basi.",
+  "check all leftovers for safe storage and spoilage signs": "Periksa semua leftover: pastikan penyimpanan aman dan tidak ada tanda basi.",
   "check the leftover base and discard anything unsafe.": "Periksa bahan leftover utama dan buang apa pun yang tidak aman.",
   "check the leftover base and discard anything unsafe": "Periksa bahan leftover utama dan buang apa pun yang tidak aman.",
   "check that the rice and any leftover lauk are safe to reuse.": "Pastikan nasi dan lauk sisa masih aman untuk digunakan kembali.",
@@ -60,6 +63,7 @@ const exactNoteTranslations = {
   "shape into small pieces so the inside cooks evenly.": "Bentuk menjadi bagian kecil agar bagian dalam matang merata.",
   "fry or cook until the outside is crisp and the inside is hot.": "Goreng atau masak sampai bagian luar renyah dan bagian dalam panas.",
   "drain briefly and serve while warm.": "Tiriskan sebentar dan sajikan selagi hangat.",
+  "drain briefly and serve while warm": "Tiriskan sebentar dan sajikan selagi hangat.",
 };
 
 const notePhraseTranslations = [
@@ -108,6 +112,9 @@ export function localizeRecipeNote(note, language) {
   }
   if (lower.startsWith("inspect all leftovers first")) {
     return "Periksa semua leftover terlebih dahulu; buang jika berbau asam, berlendir, berjamur, berubah warna tidak wajar, atau terlalu lama tidak disimpan di kulkas.";
+  }
+  if (lower.startsWith("check all leftovers for safe storage")) {
+    return "Periksa semua leftover: pastikan penyimpanan aman dan tidak ada tanda basi.";
   }
   if (lower.startsWith("heat oil and")) {
     return "Panaskan minyak, lalu tumis bawang, cabai, atau bumbu sampai harum.";

@@ -11,14 +11,13 @@ import SafetyNotice from "../components/SafetyNotice.jsx";
 import { getPdfDownloadUrl } from "../api/pdfApi";
 import { getRecommendationDetail } from "../api/recipeApi";
 import { useApp } from "../context/AppContext.jsx";
-import { buildCookingMaterials, localizeIngredient, localizeRecipeNote, localizeRecipeValue, normalizeIngredientKey } from "../utils/recipeDisplay";
+import { localizeRecipeNote, localizeRecipeValue } from "../utils/recipeDisplay";
 
 export default function RecipeDetail() {
   const { recipeId } = useParams();
   const { language } = useApp();
   const copy = detailCopy[language] || detailCopy.id;
   const [detail, setDetail] = useState(null);
-  const [checked, setChecked] = useState({});
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
 
@@ -49,10 +48,6 @@ export default function RecipeDetail() {
   if (status === "error") return <ErrorState title={copy.errorTitle} message={error} />;
 
   const recipe = detail.recipe || {};
-  const ingredients = uniqueLocalizedItems(recipe.ingredients || [], language);
-  const materials = buildCookingMaterials(detail, language);
-  const mainMaterials = materials.filter((item) => item.required || item.source === "detected" || item.source === "ingredient");
-  const additionalMaterials = materials.filter((item) => !item.required && item.source !== "detected" && item.source !== "ingredient");
   const steps = (recipe.steps || []).map((step) => localizeRecipeNote(step, language));
   const difficulty = localizeRecipeValue(recipe.difficulty || copy.defaultDifficulty, language);
   const safety = localizeRecipeValue(detail.safety_level, language);
@@ -81,48 +76,14 @@ export default function RecipeDetail() {
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-2xl font-black text-forest-900">{copy.ingredientsTitle}</h2>
-            <p className="mt-2 text-base leading-7 text-ink/65">{copy.ingredientsText}</p>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {(mainMaterials.length ? mainMaterials : ingredients.map((ingredient) => ({ label: ingredient }))).map((ingredient) => (
-                <label key={ingredient.label} className="flex min-h-14 items-center gap-3 rounded-2xl bg-earth-50 px-4 py-3 text-base font-bold text-forest-900">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(checked[ingredient.label])}
-                    onChange={(event) => setChecked((current) => ({ ...current, [ingredient.label]: event.target.checked }))}
-                    className="h-5 w-5 accent-forest-700"
-                  />
-                  {ingredient.label}
-                </label>
-              ))}
-            </div>
-            <h3 className="mt-6 text-xl font-black text-forest-900">{copy.additionalsTitle}</h3>
-            <p className="mt-2 text-base leading-7 text-ink/65">{copy.additionalsText}</p>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {(additionalMaterials.length ? additionalMaterials : [{ label: copy.noAdditionals }]).map((ingredient) => (
-                <label key={ingredient.label} className="flex min-h-14 items-center gap-3 rounded-2xl bg-mint/60 px-4 py-3 text-base font-bold text-forest-900">
-                  {ingredient.label !== copy.noAdditionals && (
-                    <input
-                      type="checkbox"
-                      checked={Boolean(checked[ingredient.label])}
-                      onChange={(event) => setChecked((current) => ({ ...current, [ingredient.label]: event.target.checked }))}
-                      className="h-5 w-5 accent-forest-700"
-                    />
-                  )}
-                  {ingredient.label}
-                </label>
-              ))}
-            </div>
-          </Card>
-
-          <Card className="p-5">
             <h2 className="text-2xl font-black text-forest-900">{copy.stepsTitle}</h2>
-            <div className="mt-4 space-y-3">
+            <p className="mt-2 text-base leading-7 text-ink/65">{copy.stepsText}</p>
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
               {steps.map((step, index) => (
-                <div key={`${step}-${index}`} className="flex gap-4 rounded-3xl bg-earth-50 p-4">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-forest-900 text-sm font-black text-white">{index + 1}</span>
-                  <p className="text-base font-semibold leading-7 text-ink/75">{step}</p>
-                </div>
+                <article key={`${step}-${index}`} className="min-w-[260px] flex-1 rounded-3xl bg-earth-50 p-4">
+                  <span className="grid h-10 w-10 place-items-center rounded-2xl bg-forest-900 text-sm font-black text-white">{index + 1}</span>
+                  <p className="mt-3 text-sm font-semibold leading-6 text-ink/75">{step}</p>
+                </article>
               ))}
             </div>
           </Card>
@@ -162,18 +123,6 @@ function HeroMetric({ icon: Icon, label, value }) {
   );
 }
 
-function uniqueLocalizedItems(items, language) {
-  const keys = new Set();
-  const localizedItems = [];
-  items.forEach((item) => {
-    const key = normalizeIngredientKey(item);
-    if (!key || keys.has(key)) return;
-    keys.add(key);
-    localizedItems.push(localizeIngredient(item, language));
-  });
-  return localizedItems;
-}
-
 function localizeReason(detail, copy, language) {
   const reason = detail.reason || "";
   if (language === "id" && (reason.startsWith("Matched ") || reason.includes("Confirm freshness"))) {
@@ -184,8 +133,8 @@ function localizeReason(detail, copy, language) {
 
 const detailCopy = {
   en: {
-    recipeBadge: "Ingredient confirmation",
-    headerText: "Confirm main ingredients and optional additions before starting the guided cooking session.",
+    recipeBadge: "Recipe preview",
+    headerText: "Review why this recipe matches, then continue to confirm ingredients and cook step by step.",
     time: "Time",
     difficulty: "Difficulty",
     servings: "Serving",
@@ -201,19 +150,15 @@ const detailCopy = {
     aiNotice: "Always check smell, texture, color, allergies, and storage time before eating leftovers.",
     whyTitle: "Why this recipe",
     reasonFallback: (name) => `${name} matches the leftovers you provided.`,
-    ingredientsTitle: "Main ingredients to confirm",
-    ingredientsText: "Check the ingredients you actually have. FoodLoop will keep optional items flexible.",
-    additionalsTitle: "Optional additions",
-    additionalsText: "Use these only if available. You can still cook without them when the recipe allows it.",
-    noAdditionals: "No optional additions listed",
     stepsTitle: "Steps preview",
+    stepsText: "A quick overview before the guided cooking mode starts.",
     beforeTitle: "Before cooking",
     beforeItems: ["No rotten smell", "No slime or mold", "Stored safely", "Heat until steaming hot"],
     startMaking: "Start Cooking",
   },
   id: {
-    recipeBadge: "Konfirmasi bahan",
-    headerText: "Konfirmasi bahan utama dan tambahan opsional sebelum mulai memasak terpandu.",
+    recipeBadge: "Pratinjau resep",
+    headerText: "Lihat alasan resep ini cocok, lalu lanjutkan untuk konfirmasi bahan dan memasak langkah demi langkah.",
     time: "Waktu",
     difficulty: "Tingkat",
     servings: "Porsi",
@@ -229,12 +174,8 @@ const detailCopy = {
     aiNotice: "Selalu cek bau, tekstur, warna, alergi, dan waktu penyimpanan sebelum memakan leftover.",
     whyTitle: "Mengapa resep ini cocok",
     reasonFallback: (name) => `${name} cocok dengan leftover yang Anda masukkan.`,
-    ingredientsTitle: "Bahan utama yang perlu dikonfirmasi",
-    ingredientsText: "Centang bahan yang benar-benar Anda punya. FoodLoop akan membuat bahan opsional tetap fleksibel.",
-    additionalsTitle: "Tambahan opsional",
-    additionalsText: "Gunakan hanya jika tersedia. Anda tetap bisa memasak tanpa bahan ini jika resep memungkinkan.",
-    noAdditionals: "Tidak ada tambahan opsional",
     stepsTitle: "Pratinjau langkah",
+    stepsText: "Ringkasan singkat sebelum mode memasak terpandu dimulai.",
     beforeTitle: "Sebelum memasak",
     beforeItems: ["Tidak bau busuk", "Tidak berlendir atau berjamur", "Disimpan dengan aman", "Panaskan sampai beruap panas"],
     startMaking: "Mulai Masak",
