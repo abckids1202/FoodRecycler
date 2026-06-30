@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     smtp_use_tls: bool = True
     whatsapp_provider_mode: str = "disabled"
+    telegram_bot_token: str = ""
+    telegram_bot_username: str = ""
+    whatsapp_access_token: str = ""
+    whatsapp_phone_number_id: str = ""
+    whatsapp_verify_token: str = ""
+    whatsapp_bot_number: str = ""
+    public_backend_url: str = ""
 
     model_config = SettingsConfigDict(env_file=BACKEND_DIR / ".env", env_file_encoding="utf-8")
 

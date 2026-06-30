@@ -1,4 +1,4 @@
-import { ArrowRight, Camera, CheckCircle2, Image, MessageSquare, ShieldCheck, Sparkles, Utensils } from "lucide-react";
+import { ArrowRight, Bot, Camera, CheckCircle2, Image, MessageCircle, MessageSquare, Send, ShieldCheck, Sparkles, Utensils } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button.jsx";
@@ -17,6 +17,8 @@ export default function Home() {
   const copy = homeCopy[language] || homeCopy.id;
   const [quickInput, setQuickInput] = useState("");
   const navigate = useNavigate();
+  const telegramUrl = import.meta.env.VITE_TELEGRAM_BOT_URL || "";
+  const whatsappUrl = import.meta.env.VITE_WHATSAPP_BOT_URL || "";
 
   function submitQuickInput(event) {
     event.preventDefault();
@@ -151,6 +153,28 @@ export default function Home() {
         mockup={<CookingGuideMockup language={language} />}
       />
 
+      <section className="space-y-5">
+        <SectionHeader eyebrow={copy.chatEyebrow} title={copy.chatTitle} text={copy.chatText} />
+        <div className="grid gap-4 md:grid-cols-2">
+          <ChatAccessCard
+            icon={Send}
+            title={copy.telegramTitle}
+            text={copy.telegramText}
+            button={copy.telegramButton}
+            href={telegramUrl}
+            unavailable={copy.comingSoon}
+          />
+          <ChatAccessCard
+            icon={MessageCircle}
+            title={copy.whatsappTitle}
+            text={copy.whatsappText}
+            button={copy.whatsappButton}
+            href={whatsappUrl}
+            unavailable={copy.comingSoon}
+          />
+        </div>
+      </section>
+
       <ProductSection
         eyebrow={copy.previewE.eyebrow}
         title={copy.previewE.title}
@@ -216,6 +240,28 @@ function MockInput({ icon: Icon, text }) {
   );
 }
 
+function ChatAccessCard({ icon: Icon, title, text, button, href, unavailable }) {
+  const enabled = Boolean(href);
+  return (
+    <Card className="flex h-full flex-col p-5">
+      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-900 text-white">
+        <Icon size={22} />
+      </span>
+      <h3 className="mt-4 text-2xl font-black text-forest-900">{title}</h3>
+      <p className="mt-2 flex-1 text-base leading-7 text-ink/70">{text}</p>
+      {enabled ? (
+        <Button as="a" href={href} target="_blank" rel="noreferrer" className="mt-5 min-h-14 rounded-2xl text-base">
+          <Bot size={18} /> {button}
+        </Button>
+      ) : (
+        <button type="button" disabled className="mt-5 min-h-14 rounded-2xl bg-earth-100 px-5 text-base font-black text-ink/45">
+          {unavailable}
+        </button>
+      )}
+    </Card>
+  );
+}
+
 const sharedIcons = [Camera, ShieldCheck, Utensils];
 
 const homeCopy = {
@@ -255,6 +301,16 @@ const homeCopy = {
     previewB: { eyebrow: "Safety first", title: "Cek keamanan sebelum memasak", text: "Sebelum menyarankan resep, FoodLoop meminta konfirmasi kondisi penting agar pengguna tidak asal mengolah makanan berisiko." },
     previewC: { eyebrow: "Resep familiar", title: "Resep Indonesia yang masuk akal", text: "Kartu resep menonjolkan waktu, kesulitan, bahan yang dipakai, dan alasan singkat tanpa skor teknis." },
     previewD: { eyebrow: "Saat memasak", title: "Masak langkah demi langkah", text: "Instruksi besar dan tombol jelas membantu pengguna mengikuti resep sambil berdiri di dapur." },
+    chatEyebrow: "Akses lewat chat",
+    chatTitle: "Pakai FoodLoop lewat WhatsApp atau Telegram",
+    chatText: "Tidak perlu membuka website setiap kali. Kirim foto atau tulis sisa makanan langsung dari chat. FoodLoop akan membantu cek keamanan dan memberi ide resep Indonesia.",
+    telegramTitle: "Telegram Bot",
+    telegramText: "Cocok untuk demo dan testing. Kirim foto atau teks langsung ke FoodLoop.",
+    telegramButton: "Chat via Telegram",
+    whatsappTitle: "WhatsApp Bot",
+    whatsappText: "Cocok untuk pengguna harian. Kirim pesan ke nomor FoodLoop.",
+    whatsappButton: "Chat via WhatsApp",
+    comingSoon: "Segera hadir",
     previewE: { eyebrow: "Tersimpan", title: "Riwayat dan ringkasan", text: "FoodLoop menyimpan analisis, resep yang dimulai, selesai, atau berhenti agar progres dapat dilihat lagi." },
     photoMockup: "Foto makanan",
     galleryMockup: "Pilih dari galeri",
@@ -307,6 +363,16 @@ const homeCopy = {
     previewB: { eyebrow: "Safety first", title: "Check safety before cooking", text: "FoodLoop asks for important condition checks before suggesting a recipe." },
     previewC: { eyebrow: "Familiar recipes", title: "Indonesian recipes that make sense", text: "Recipe cards show time, difficulty, ingredients used, and a short reason without technical scores." },
     previewD: { eyebrow: "While cooking", title: "Cook step by step", text: "Large instructions and clear buttons help users follow the recipe in the kitchen." },
+    chatEyebrow: "Chat access",
+    chatTitle: "Use FoodLoop through WhatsApp or Telegram",
+    chatText: "You do not need to open the website every time. Send a photo or write leftovers directly from chat, and FoodLoop will help check safety and suggest Indonesian recipes.",
+    telegramTitle: "Telegram Bot",
+    telegramText: "Best for demos and testing. Send a photo or text directly to FoodLoop.",
+    telegramButton: "Chat via Telegram",
+    whatsappTitle: "WhatsApp Bot",
+    whatsappText: "Best for daily use. Send a message to the FoodLoop number.",
+    whatsappButton: "Chat via WhatsApp",
+    comingSoon: "Coming soon",
     previewE: { eyebrow: "Saved progress", title: "History and summary", text: "FoodLoop saves analyses and cooking sessions so progress can be revisited." },
     photoMockup: "Take a photo",
     galleryMockup: "Choose from gallery",

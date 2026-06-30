@@ -171,3 +171,36 @@ class ContactMessage(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped[Optional[User]] = relationship()
+
+
+class BotConversation(Base):
+    __tablename__ = "bot_conversations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    platform: Mapped[str] = mapped_column(String(40), nullable=False, index=True)
+    platform_user_id: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    display_name: Mapped[Optional[str]] = mapped_column(String(160), nullable=True)
+    language: Mapped[str] = mapped_column(String(8), default="id")
+    state: Mapped[str] = mapped_column(String(80), default="START")
+    context_json: Mapped[dict] = mapped_column(JSON, default=dict)
+    last_analysis_id: Mapped[Optional[int]] = mapped_column(ForeignKey("analyses.id"), nullable=True)
+    last_recommendation_id: Mapped[Optional[int]] = mapped_column(ForeignKey("recommendations.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    analysis: Mapped[Optional[Analysis]] = relationship()
+    recommendation: Mapped[Optional[Recommendation]] = relationship()
+
+
+class BotMessage(Base):
+    __tablename__ = "bot_messages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    conversation_id: Mapped[int] = mapped_column(ForeignKey("bot_conversations.id"), nullable=False)
+    direction: Mapped[str] = mapped_column(String(20), nullable=False)
+    message_type: Mapped[str] = mapped_column(String(40), default="text")
+    text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    media_url: Mapped[Optional[str]] = mapped_column(String(800), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    conversation: Mapped[BotConversation] = relationship()
