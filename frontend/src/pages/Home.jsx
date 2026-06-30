@@ -20,7 +20,7 @@ export default function Home() {
 
   function submitQuickInput(event) {
     event.preventDefault();
-    navigate("/start", { state: { initialText: quickInput.trim() } });
+    navigate("/start/text", { state: { initialText: quickInput.trim() } });
   }
 
   return (

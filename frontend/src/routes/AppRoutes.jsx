@@ -31,8 +31,9 @@ export default function AppRoutes() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/start" element={<Start />} />
+                <Route path="/start/:method" element={<Start />} />
                 <Route path="/upload" element={<Navigate to="/start" replace />} />
-                <Route path="/camera" element={<Navigate to="/upload" replace />} />
+                <Route path="/camera" element={<Navigate to="/start/camera" replace />} />
                 <Route path="/chat" element={<ChatHelper />} />
                 <Route path="/help" element={<Help />} />
                 <Route path="/analysis/:batchId" element={<AnalysisResult />} />

@@ -3,11 +3,18 @@ import { translations } from "../i18n/translations";
 
 const AppContext = createContext(null);
 
-const languageStorageKey = "foodloop_language";
+const legacyLanguageStorageKey = "foodloop_language";
+const languageStorageKey = "foodloop_language_v2";
 const userStorageKey = "foodloop_user";
 
 export function AppProvider({ children }) {
-  const [language, setLanguageState] = useState(() => localStorage.getItem(languageStorageKey) || "id");
+  const [language, setLanguageState] = useState(() => {
+    const stored = localStorage.getItem(languageStorageKey);
+    if (stored === "id" || stored === "en") return stored;
+    localStorage.removeItem(legacyLanguageStorageKey);
+    localStorage.setItem(languageStorageKey, "id");
+    return "id";
+  });
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem(userStorageKey);
     return stored ? JSON.parse(stored) : null;

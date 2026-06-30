@@ -43,6 +43,13 @@ const exactNoteTranslations = {
   "heat until steaming hot": "Panaskan hingga benar-benar panas dan beruap.",
   "cook until fully set.": "Masak hingga matang sempurna.",
   "cook until fully set": "Masak hingga matang sempurna.",
+  "check the leftover base and discard anything unsafe.": "Periksa bahan leftover utama dan buang apa pun yang tidak aman.",
+  "check the leftover base and discard anything unsafe": "Periksa bahan leftover utama dan buang apa pun yang tidak aman.",
+  "mash, shred, or chop the main ingredient so it mixes evenly.": "Haluskan, suwir, atau potong bahan utama agar tercampur merata.",
+  "combine with seasoning, egg or starch if needed, and fresh aromatics.": "Campurkan dengan bumbu, telur atau pati jika perlu, serta bumbu aromatik segar.",
+  "shape into small pieces so the inside cooks evenly.": "Bentuk menjadi bagian kecil agar bagian dalam matang merata.",
+  "fry or cook until the outside is crisp and the inside is hot.": "Goreng atau masak sampai bagian luar renyah dan bagian dalam panas.",
+  "drain briefly and serve while warm.": "Tiriskan sebentar dan sajikan selagi hangat.",
 };
 
 const notePhraseTranslations = [
@@ -91,6 +98,24 @@ export function localizeRecipeNote(note, language) {
   }
   if (lower.startsWith("inspect all leftovers first")) {
     return "Periksa semua leftover terlebih dahulu; buang jika berbau asam, berlendir, berjamur, berubah warna tidak wajar, atau terlalu lama tidak disimpan di kulkas.";
+  }
+  if (lower.startsWith("check the leftover base")) {
+    return "Periksa bahan leftover utama dan buang apa pun yang tidak aman.";
+  }
+  if (lower.startsWith("mash, shred, or chop")) {
+    return "Haluskan, suwir, atau potong bahan utama agar tercampur merata.";
+  }
+  if (lower.startsWith("combine with seasoning")) {
+    return "Campurkan dengan bumbu, telur atau pati jika perlu, serta bumbu aromatik segar.";
+  }
+  if (lower.startsWith("shape into small pieces")) {
+    return "Bentuk menjadi bagian kecil agar bagian dalam matang merata.";
+  }
+  if (lower.startsWith("fry or cook until")) {
+    return "Goreng atau masak sampai bagian luar renyah dan bagian dalam panas.";
+  }
+  if (lower.startsWith("drain briefly")) {
+    return "Tiriskan sebentar dan sajikan selagi hangat.";
   }
   if (lower.startsWith("cook egg until fully set")) {
     return "Masak telur hingga matang sempurna, kecuali resep langsung disajikan dan panduan keamanan pangan memperbolehkannya.";

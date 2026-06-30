@@ -1,4 +1,4 @@
-import { Bot, ChefHat, History, Home, Menu, X } from "lucide-react";
+import { BarChart3, Bot, ChefHat, History, Home, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useApp } from "../context/AppContext.jsx";
@@ -17,6 +17,7 @@ export default function AppLayout({ children }) {
     { to: "/", label: t.navHome },
     { to: "/start", label: t.navStart },
     { to: "/history", label: t.navHistory },
+    { to: "/dashboard", label: t.navDashboard },
     { to: "/help", label: t.navHelp },
     ...(isAdmin ? [{ to: "/admin", label: t.navAdmin }] : []),
   ];
@@ -24,6 +25,7 @@ export default function AppLayout({ children }) {
     { to: "/", label: t.navHome, icon: Home },
     { to: "/start", label: t.navStart, icon: ChefHat },
     { to: "/history", label: t.navHistory, icon: History },
+    { to: "/dashboard", label: t.navDashboard, icon: BarChart3 },
     { to: "/help", label: t.navHelp, icon: Bot },
   ];
 
@@ -128,7 +130,7 @@ export default function AppLayout({ children }) {
         </div>
       </footer>
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-forest-900/10 bg-white/95 px-2 py-2 shadow-[0_-10px_30px_rgba(16,48,32,0.10)] backdrop-blur md:hidden">
-        <div className="mx-auto grid max-w-lg grid-cols-4 gap-1">
+        <div className="mx-auto grid max-w-lg grid-cols-5 gap-1">
           {bottomLinks.map((item) => (
             <NavLink
               key={item.to}

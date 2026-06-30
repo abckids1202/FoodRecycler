@@ -1,6 +1,6 @@
 import { Camera, CheckCircle2, Image, MessageSquare, RefreshCcw, Search, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button.jsx";
 import Card from "../components/Card.jsx";
 import ErrorState from "../components/ErrorState.jsx";
@@ -19,9 +19,11 @@ export default function Start() {
   const copy = startCopy[language] || startCopy.id;
   const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams();
+  const routeMethod = ["camera", "gallery", "text"].includes(params.method) ? params.method : "";
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [method, setMethod] = useState(location.state?.initialText ? "text" : "");
+  const [method, setMethod] = useState(routeMethod || (location.state?.initialText ? "text" : ""));
   const [foodText, setFoodText] = useState(location.state?.initialText || "");
   const [file, setFile] = useState(null);
   const [captureUrl, setCaptureUrl] = useState(null);
@@ -34,6 +36,10 @@ export default function Start() {
   const previewUrl = useMemo(() => fileToPreviewUrl(file), [file]);
   const selectedImageUrl = captureUrl || previewUrl;
   const currentStep = method ? 1 : 0;
+
+  useEffect(() => {
+    setMethod(routeMethod || (location.state?.initialText ? "text" : ""));
+  }, [routeMethod, location.state?.initialText]);
 
   useEffect(() => {
     if (method !== "camera") {
@@ -113,7 +119,7 @@ export default function Start() {
   return (
     <div className="space-y-6">
       <section className="rounded-[2rem] bg-forest-900 p-5 text-white shadow-soft sm:p-8">
-        <div className="grid gap-6 lg:grid-cols-[1fr_420px] lg:items-end">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:items-end">
           <div>
             <FoodChip tone="yellow">{copy.badge}</FoodChip>
             <h1 className="mt-5 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">{copy.title}</h1>
@@ -125,7 +131,7 @@ export default function Start() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <div className="space-y-5">
-          <Card className="p-5">
+          {!method && <Card className="p-5">
             <h2 className="text-2xl font-black text-forest-900">{copy.chooseTitle}</h2>
             <p className="mt-2 text-base leading-7 text-ink/65">{copy.chooseText}</p>
             <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -133,8 +139,8 @@ export default function Start() {
                 <button
                   key={item.value}
                   type="button"
-                  onClick={() => setMethod(item.value)}
-                  className={`focus-ring min-h-32 rounded-3xl border p-5 text-left transition hover:-translate-y-0.5 ${method === item.value ? "border-forest-900 bg-mint shadow-soft" : "border-forest-900/10 bg-earth-50 hover:bg-white"}`}
+                  onClick={() => navigate(`/start/${item.value}`)}
+                  className="focus-ring min-h-32 rounded-3xl border border-forest-900/10 bg-earth-50 p-5 text-left transition hover:-translate-y-0.5 hover:bg-white"
                 >
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-900 text-white">
                     <item.icon size={22} />
@@ -144,12 +150,19 @@ export default function Start() {
                 </button>
               ))}
             </div>
-          </Card>
+          </Card>}
 
           {method && (
             <Card className="p-5">
-              <h2 className="text-2xl font-black text-forest-900">{copy.inputTitle}</h2>
-              <p className="mt-2 text-base leading-7 text-ink/65">{copy.inputText}</p>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h2 className="text-2xl font-black text-forest-900">{copy.methodDetails[method]?.title || copy.inputTitle}</h2>
+                  <p className="mt-2 text-base leading-7 text-ink/65">{copy.methodDetails[method]?.text || copy.inputText}</p>
+                </div>
+                <Button as={Link} to="/start" variant="secondary" className="min-h-11 rounded-2xl">
+                  {copy.changeMethod}
+                </Button>
+              </div>
 
               {method === "gallery" && (
                 <div className="mt-5">
@@ -276,6 +289,12 @@ const startCopy = {
       { value: "gallery", title: "Pilih dari galeri", text: "Unggah foto dari HP atau laptop", icon: Image },
       { value: "text", title: "Tulis sendiri", text: "Ketik sisa makanan yang ada", icon: MessageSquare },
     ],
+    methodDetails: {
+      camera: { title: "Foto makanan langsung", text: "Arahkan kamera ke sisa makanan. Pastikan cahaya cukup dan makanan terlihat jelas." },
+      gallery: { title: "Unggah foto dari galeri", text: "Pilih foto makanan dari HP atau laptop. Tambahkan catatan jika ada bahan yang tidak terlihat." },
+      text: { title: "Tulis sisa makanan", text: "Ketik bahan yang ada dengan bahasa sehari-hari. Semakin spesifik, semakin baik rekomendasinya." },
+    },
+    changeMethod: "Ganti cara input",
     inputTitle: "Masukkan makanan",
     inputText: "Cukup tulis atau foto bahan yang ada. Detail kecil seperti sambal atau saus juga membantu.",
     textPlaceholder: "Contoh: nasi sisa, telur, sambal, ayam goreng. Disimpan di kulkas sejak semalam.",
@@ -338,6 +357,12 @@ const startCopy = {
       { value: "gallery", title: "Choose from gallery", text: "Upload a photo from your device", icon: Image },
       { value: "text", title: "Write it yourself", text: "Type the leftovers you have", icon: MessageSquare },
     ],
+    methodDetails: {
+      camera: { title: "Take a live photo", text: "Point your camera at the leftovers. Make sure the food is clear and well lit." },
+      gallery: { title: "Upload from gallery", text: "Choose a food photo from your device. Add notes if some ingredients are not visible." },
+      text: { title: "Write leftovers", text: "Type the ingredients in everyday language. More specific input gives better recommendations." },
+    },
+    changeMethod: "Change input method",
     inputTitle: "Enter food",
     inputText: "Write or photograph what you have. Small details like sauces help.",
     textPlaceholder: "Example: leftover rice, egg, sambal, fried chicken. Stored in the fridge since last night.",

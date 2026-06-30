@@ -105,7 +105,7 @@ export default function HistoryDetail() {
                 <div key={item.id} className="flex flex-col gap-3 rounded-lg bg-earth-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="font-bold text-forest-900">{item.recipe_name}</p>
-                    <p className="mt-1 text-sm text-ink/60">{copy.score} {item.score}</p>
+                    <p className="mt-1 text-sm text-ink/60">{copy.recipeFit}</p>
                   </div>
                   <Button as={Link} to={`/recipes/${item.id}`} variant="secondary" className="min-h-9 px-3 py-1.5">
                     {copy.viewRecipe}
@@ -148,7 +148,7 @@ const detailCopy = {
     created: "Created",
     detectedLeftovers: "Detected leftovers",
     recipeMatches: "Recipe matches",
-    score: "Score",
+    recipeFit: "Matches your leftovers",
     viewRecipe: "View recipe",
     none: "None",
     statusLabels: {
@@ -175,7 +175,7 @@ const detailCopy = {
     created: "Dibuat",
     detectedLeftovers: "Leftover terdeteksi",
     recipeMatches: "Kecocokan resep",
-    score: "Skor",
+    recipeFit: "Cocok dengan sisa makanan Anda",
     viewRecipe: "Lihat resep",
     none: "Tidak ada",
     statusLabels: {
