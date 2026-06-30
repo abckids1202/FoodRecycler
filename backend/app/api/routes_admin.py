@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.database.db import get_db
-from app.database.models import Analysis, NotificationLog, NotificationPreference, RecipeCookingSession, Recommendation, User, UserFeedback
-from app.schemas.admin import AdminMetric, AdminRecentUser, AdminSummary
+from app.database.models import Analysis, ContactMessage, NotificationLog, NotificationPreference, RecipeCookingSession, Recommendation, User, UserFeedback
+from app.schemas.admin import AdminContactMessage, AdminMetric, AdminRecentUser, AdminSummary
 
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -30,10 +30,12 @@ def admin_summary(_: str = Depends(require_admin), db: Session = Depends(get_db)
     feedback_count = db.query(UserFeedback).count()
     reminder_opt_ins = db.query(NotificationPreference).filter(NotificationPreference.stopped_at.is_(None)).count()
     reminder_logs = db.query(NotificationLog).count()
+    contact_messages = db.query(ContactMessage).count()
     reactivated = db.query(NotificationPreference).filter(NotificationPreference.last_reactivated_at.is_not(None)).count()
     reactivation_rate = round((reactivated / reminder_opt_ins) * 100, 1) if reminder_opt_ins else 0.0
 
     recent = db.query(User).order_by(User.created_at.desc()).limit(8).all()
+    recent_contacts = db.query(ContactMessage).order_by(ContactMessage.created_at.desc()).limit(6).all()
     return AdminSummary(
         totals=[
             AdminMetric(label="Registered users", value=users),
@@ -45,6 +47,7 @@ def admin_summary(_: str = Depends(require_admin), db: Session = Depends(get_db)
             AdminMetric(label="Feedback responses", value=feedback_count),
             AdminMetric(label="Reminder opt-ins", value=reminder_opt_ins),
             AdminMetric(label="Reminder logs", value=reminder_logs),
+            AdminMetric(label="Help messages", value=contact_messages),
         ],
         recent_users=[
             AdminRecentUser(
@@ -56,6 +59,18 @@ def admin_summary(_: str = Depends(require_admin), db: Session = Depends(get_db)
                 created_at=user.created_at,
             )
             for user in recent
+        ],
+        recent_contact_messages=[
+            AdminContactMessage(
+                id=item.id,
+                name=item.name,
+                email=item.email,
+                topic=item.topic,
+                message=item.message,
+                status=item.status,
+                created_at=item.created_at,
+            )
+            for item in recent_contacts
         ],
         reminder_reactivation_rate=reactivation_rate,
         privacy_note="Admin data is limited to product analytics fields. Do not expose OpenAI keys, Google secrets, passwords, or raw private messages.",

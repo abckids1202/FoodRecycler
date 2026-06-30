@@ -19,8 +19,19 @@ class AdminRecentUser(BaseModel):
     created_at: datetime
 
 
+class AdminContactMessage(BaseModel):
+    id: int
+    name: str | None = None
+    email: str | None = None
+    topic: str
+    message: str
+    status: str
+    created_at: datetime
+
+
 class AdminSummary(BaseModel):
     totals: list[AdminMetric]
     recent_users: list[AdminRecentUser]
+    recent_contact_messages: list[AdminContactMessage]
     reminder_reactivation_rate: float
     privacy_note: str

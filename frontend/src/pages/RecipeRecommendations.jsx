@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import EmptyState from "../components/EmptyState.jsx";
 import ErrorState from "../components/ErrorState.jsx";
 import LoadingState from "../components/LoadingState.jsx";
+import Button from "../components/Button.jsx";
 import RecommendationCard from "../components/RecommendationCard.jsx";
 import SafetyNotice from "../components/SafetyNotice.jsx";
 import { generatePdf } from "../api/pdfApi";
@@ -58,7 +59,14 @@ export default function RecipeRecommendations() {
       </section>
 
       {status === "loading" && <LoadingState title={copy.loadingTitle} message={copy.loadingMessage} />}
-      {status === "error" && <ErrorState title={copy.errorTitle} message={error} />}
+      {status === "error" && (
+        <div className="rounded-[2rem] border border-red-200 bg-red-50 p-5 shadow-soft">
+          <ErrorState title={copy.errorTitle} message={error?.toLowerCase?.().includes("analysis not found") ? copy.analysisMissing : error} />
+          <Button type="button" className="mt-4 min-h-12 rounded-2xl" onClick={() => navigate("/start")}>
+            {copy.restart}
+          </Button>
+        </div>
+      )}
       {status === "ready" && recommendations.length === 0 && (
         <EmptyState title={copy.emptyTitle} message={copy.emptyMessage} />
       )}
@@ -93,6 +101,8 @@ const recommendationCopy = {
     loadingTitle: "Finding recipe ideas",
     loadingMessage: "FoodLoop is matching your leftovers with Indonesian recipes.",
     errorTitle: "Could not load recipes",
+    analysisMissing: "This analysis could not be found anymore. Please enter the leftovers again so FoodLoop can create fresh recipe ideas.",
+    restart: "Enter leftovers again",
     emptyTitle: "No recipe is safe to suggest yet",
     emptyMessage: "Try adding clearer ingredient names such as rice, egg, chicken, tofu, tempeh, sambal, vegetables, bread, or banana.",
   },
@@ -105,6 +115,8 @@ const recommendationCopy = {
     loadingTitle: "Mencari ide resep",
     loadingMessage: "FoodLoop sedang mencocokkan leftover dengan resep Indonesia.",
     errorTitle: "Resep belum bisa dimuat",
+    analysisMissing: "Analisis ini tidak ditemukan lagi. Masukkan leftover ulang agar FoodLoop bisa membuat ide resep baru.",
+    restart: "Masukkan leftover lagi",
     emptyTitle: "Belum ada resep yang aman disarankan",
     emptyMessage: "Coba tambahkan nama bahan yang lebih jelas, misalnya nasi, telur, ayam, tahu, tempe, sambal, sayur, roti, atau pisang.",
   },

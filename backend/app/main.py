@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import routes_admin, routes_analysis, routes_auth, routes_chat, routes_config, routes_dashboard, routes_feedback, routes_health, routes_notifications, routes_pdf, routes_recipes
+from app.api import routes_admin, routes_analysis, routes_auth, routes_chat, routes_config, routes_contact, routes_dashboard, routes_feedback, routes_health, routes_notifications, routes_pdf, routes_recipes
 from app.core.config import settings
 from app.database.db import Base, engine
 from app.database.schema_guards import ensure_runtime_columns
@@ -40,6 +40,7 @@ app.include_router(routes_auth.router)
 app.include_router(routes_analysis.router)
 app.include_router(routes_recipes.router)
 app.include_router(routes_chat.router)
+app.include_router(routes_contact.router)
 app.include_router(routes_feedback.router)
 app.include_router(routes_dashboard.router)
 app.include_router(routes_config.router)

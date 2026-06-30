@@ -1,4 +1,4 @@
-import { FileText, LockKeyhole, Scale, Shield, Users } from "lucide-react";
+import { FileText, LockKeyhole, MessageSquare, Scale, Shield, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import ErrorState from "../components/ErrorState.jsx";
 import LoadingState from "../components/LoadingState.jsx";
@@ -86,6 +86,27 @@ export default function AdminPanel() {
             </aside>
           </section>
           <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-forest-900">
+              <MessageSquare size={20} /> {copy.contactMessages}
+            </h2>
+            <div className="mt-4 grid gap-3 lg:grid-cols-2">
+              {data.recent_contact_messages?.length ? (
+                data.recent_contact_messages.map((item) => (
+                  <article key={item.id} className="rounded-lg border border-forest-900/10 bg-earth-50 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-bold text-forest-900">{item.topic || copy.noTopic}</p>
+                      <span className="rounded-full bg-mint px-3 py-1 text-xs font-black text-forest-900">{item.status}</span>
+                    </div>
+                    <p className="mt-1 text-sm text-ink/55">{item.name || copy.anonymous} · {item.email || copy.noEmail}</p>
+                    <p className="mt-3 text-sm leading-6 text-ink/75">{item.message}</p>
+                  </article>
+                ))
+              ) : (
+                <p className="rounded-lg bg-earth-50 p-4 text-sm font-semibold text-ink/60">{copy.noContactMessages}</p>
+              )}
+            </div>
+          </section>
+          <section className="rounded-lg border border-forest-900/10 bg-white p-5 shadow-soft">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.14em] text-forest-700">{copy.safetyEyebrow}</p>
@@ -141,6 +162,11 @@ const adminCopy = {
     metricHint: "All users",
     recentUsers: "Recent users",
     privacyTitle: "Privacy guard",
+    contactMessages: "Recent help messages",
+    noContactMessages: "No help messages yet.",
+    anonymous: "Anonymous",
+    noEmail: "No email",
+    noTopic: "No topic",
     privacyNote:
       "Admin data is limited to product analytics fields. Do not expose OpenAI keys, Google secrets, passwords, or raw private messages.",
     reactivation: "Reminder reactivation rate",
@@ -180,6 +206,11 @@ const adminCopy = {
     metricHint: "Semua user",
     recentUsers: "User terbaru",
     privacyTitle: "Penjaga privasi",
+    contactMessages: "Pesan bantuan terbaru",
+    noContactMessages: "Belum ada pesan bantuan.",
+    anonymous: "Tanpa nama",
+    noEmail: "Tanpa email",
+    noTopic: "Tanpa topik",
     privacyNote:
       "Data admin dibatasi pada analitik produk. Jangan tampilkan kunci OpenAI, rahasia Google, kata sandi, atau pesan pribadi mentah.",
     reactivation: "Tingkat reaktivasi pengingat",

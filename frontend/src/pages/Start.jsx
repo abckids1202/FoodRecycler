@@ -31,14 +31,18 @@ export default function Start() {
   const [cookedAt, setCookedAt] = useState("");
   const [storage, setStorage] = useState("");
   const [spoilage, setSpoilage] = useState("");
+  const [phase, setPhase] = useState(method ? "input" : "choose");
+  const [safetyStep, setSafetyStep] = useState(0);
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
   const previewUrl = useMemo(() => fileToPreviewUrl(file), [file]);
   const selectedImageUrl = captureUrl || previewUrl;
-  const currentStep = method ? 1 : 0;
+  const currentStep = phase === "safety" ? 1 : method ? 0 : 0;
 
   useEffect(() => {
     setMethod(routeMethod || (location.state?.initialText ? "text" : ""));
+    setPhase(routeMethod || location.state?.initialText ? "input" : "choose");
+    setSafetyStep(0);
   }, [routeMethod, location.state?.initialText]);
 
   useEffect(() => {
@@ -114,7 +118,37 @@ export default function Start() {
     }
   }
 
-  const canSubmit = method === "text" ? foodText.trim() : file || captureUrl;
+  const safetyQuestions = [
+    { key: "cooked", title: copy.cookedQuestion, value: cookedAt, onChange: setCookedAt, options: copy.cookedOptions },
+    { key: "storage", title: copy.storageQuestion, value: storage, onChange: setStorage, options: copy.storageOptions },
+    { key: "spoilage", title: copy.spoilageQuestion, value: spoilage, onChange: setSpoilage, options: copy.spoilageOptions },
+  ];
+  const activeSafetyQuestion = safetyQuestions[safetyStep] || safetyQuestions[0];
+  const hasFoodInput = method === "text" ? foodText.trim() : file || captureUrl;
+  const canSubmit = phase === "safety" && cookedAt && storage && spoilage && hasFoodInput;
+
+  function goToSafety() {
+    if (!hasFoodInput) {
+      setError(copy.needInput);
+      return;
+    }
+    setError("");
+    setPhase("safety");
+    setSafetyStep(0);
+  }
+
+  function handleSafetyNext() {
+    if (!activeSafetyQuestion.value) {
+      setError(copy.needSafetyAnswer);
+      return;
+    }
+    setError("");
+    if (safetyStep < safetyQuestions.length - 1) {
+      setSafetyStep((current) => current + 1);
+      return;
+    }
+    handleSubmit();
+  }
 
   return (
     <div className="space-y-6">
@@ -152,7 +186,7 @@ export default function Start() {
             </div>
           </Card>}
 
-          {method && (
+          {method && phase === "input" && (
             <Card className="p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -207,7 +241,7 @@ export default function Start() {
             </Card>
           )}
 
-          {method && (
+          {method && phase === "safety" && (
             <Card className="p-5">
               <div className="flex items-start gap-3">
                 <span className="grid h-12 w-12 place-items-center rounded-2xl bg-food-yellow text-forest-900">
@@ -218,9 +252,17 @@ export default function Start() {
                   <p className="mt-1 text-base leading-7 text-ink/65">{copy.safetyText}</p>
                 </div>
               </div>
-              <SafetyQuestion title={copy.cookedQuestion} value={cookedAt} onChange={setCookedAt} options={copy.cookedOptions} />
-              <SafetyQuestion title={copy.storageQuestion} value={storage} onChange={setStorage} options={copy.storageOptions} />
-              <SafetyQuestion title={copy.spoilageQuestion} value={spoilage} onChange={setSpoilage} options={copy.spoilageOptions} />
+              <div className="mt-5 flex flex-wrap gap-2">
+                {safetyQuestions.map((question, index) => (
+                  <span
+                    key={question.key}
+                    className={`rounded-full px-3 py-1.5 text-xs font-black ${index === safetyStep ? "bg-forest-900 text-white" : question.value ? "bg-mint text-forest-900" : "bg-earth-100 text-ink/55"}`}
+                  >
+                    {index + 1}. {copy.safetyStepLabels[index]}
+                  </span>
+                ))}
+              </div>
+              <SafetyQuestion title={activeSafetyQuestion.title} value={activeSafetyQuestion.value} onChange={activeSafetyQuestion.onChange} options={activeSafetyQuestion.options} />
               <SafetyNotice title={copy.safetyNoteTitle}>{copy.safetyNote}</SafetyNotice>
             </Card>
           )}
@@ -230,8 +272,13 @@ export default function Start() {
 
           {method && (
             <div className="rounded-3xl bg-white p-3 shadow-soft">
-              <Button type="button" className="min-h-14 w-full rounded-2xl text-base" onClick={handleSubmit} disabled={!canSubmit || status === "loading"}>
-                <Search size={19} /> {copy.submit}
+              <Button
+                type="button"
+                className="min-h-14 w-full rounded-2xl text-base"
+                onClick={phase === "safety" ? handleSafetyNext : goToSafety}
+                disabled={(phase === "safety" ? !canSubmit && safetyStep === safetyQuestions.length - 1 : !hasFoodInput) || status === "loading"}
+              >
+                <Search size={19} /> {phase === "safety" ? (safetyStep === safetyQuestions.length - 1 ? copy.submit : copy.nextSafety) : copy.continueSafety}
               </Button>
             </div>
           )}
@@ -304,6 +351,7 @@ const startCopy = {
     cameraDenied: "Izin kamera ditolak.",
     safetyTitle: "Cek keamanan singkat",
     safetyText: "Jawab sebentar. Kalau ragu, FoodLoop akan mengutamakan keamanan.",
+    safetyStepLabels: ["Waktu", "Simpan", "Tanda"],
     cookedQuestion: "Kapan makanan ini dimasak atau dibeli?",
     storageQuestion: "Disimpan di mana?",
     spoilageQuestion: "Ada tanda basi?",
@@ -341,6 +389,9 @@ const startCopy = {
     loadingMessage: "FoodLoop sedang cek keamanan dan menyiapkan ide resep.",
     errorTitle: "Koneksi ke server gagal",
     needInput: "Masukkan foto atau teks terlebih dahulu.",
+    needSafetyAnswer: "Pilih satu jawaban keamanan terlebih dahulu.",
+    continueSafety: "Lanjut cek keamanan",
+    nextSafety: "Lanjut",
     submit: "Lihat Ide Resep",
     sideTitle: "Setelah ini",
     sideItems: ["Cek bahan yang terlihat", "Tambahkan bahan yang terlewat", "Pilih resep yang cocok", "Ikuti langkah memasak"],
@@ -372,6 +423,7 @@ const startCopy = {
     cameraDenied: "Camera permission was denied.",
     safetyTitle: "Quick safety check",
     safetyText: "Answer briefly. When unsure, FoodLoop prioritizes safety.",
+    safetyStepLabels: ["Time", "Storage", "Signs"],
     cookedQuestion: "When was this cooked or bought?",
     storageQuestion: "Where was it stored?",
     spoilageQuestion: "Any spoilage signs?",
@@ -397,6 +449,9 @@ const startCopy = {
     loadingMessage: "FoodLoop is checking safety and preparing recipe ideas.",
     errorTitle: "Could not reach server",
     needInput: "Add a photo or text first.",
+    needSafetyAnswer: "Choose one safety answer first.",
+    continueSafety: "Continue to safety check",
+    nextSafety: "Continue",
     submit: "See Recipe Ideas",
     sideTitle: "Next",
     sideItems: ["Check visible ingredients", "Add missing ingredients", "Choose a matching recipe", "Follow cooking steps"],

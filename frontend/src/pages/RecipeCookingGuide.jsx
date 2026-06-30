@@ -70,7 +70,8 @@ export default function RecipeCookingGuide() {
       const result = await startCookingSession(recipeId, { user_id: user?.id || null });
       setSession(result);
       setStepIndex(0);
-      setPhase("steps");
+      setPhase("starting");
+      window.setTimeout(() => setPhase("steps"), 900);
     } catch (requestError) {
       setError(requestError.response?.data?.detail || requestError.message);
     }
@@ -158,6 +159,16 @@ export default function RecipeCookingGuide() {
               {copy.backToPreview}
             </Button>
           </div>
+        </section>
+      )}
+
+      {status === "ready" && phase === "starting" && (
+        <section className="rounded-[2rem] border border-forest-900/10 bg-white p-8 text-center shadow-soft">
+          <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-mint">
+            <div className="h-14 w-14 animate-spin rounded-full border-4 border-forest-900/15 border-t-forest-900" />
+          </div>
+          <h2 className="mt-5 text-3xl font-black text-forest-900">{copy.startingTitle}</h2>
+          <p className="mx-auto mt-2 max-w-xl text-base leading-7 text-ink/65">{copy.startingText}</p>
         </section>
       )}
 
@@ -264,6 +275,8 @@ const cookingCopy = {
     confirmText: "Confirm the required ingredients first. Optional ingredients can be skipped if they are unavailable.",
     safetyWarning: "FoodLoop uses AI and can make mistakes. Double-check freshness, allergies, and food safety before cooking.",
     startCooking: "Start Cooking",
+    startingTitle: "Preparing your cooking steps",
+    startingText: "FoodLoop is opening a cooking session and arranging the recipe one step at a time.",
     optionalBadge: "optional",
     requiredOnlyHint: "Only required ingredients must be checked before starting. Optional ingredients are suggestions.",
     backToPreview: "Back to Preview",
@@ -299,6 +312,8 @@ const cookingCopy = {
     confirmText: "Konfirmasi bahan wajib terlebih dahulu. Bahan opsional boleh dilewati jika tidak tersedia.",
     safetyWarning: "FoodLoop memakai AI dan bisa keliru. Periksa ulang kesegaran, alergi, dan keamanan makanan sebelum memasak.",
     startCooking: "Mulai Memasak",
+    startingTitle: "Menyiapkan langkah memasak",
+    startingText: "FoodLoop sedang membuka sesi memasak dan menyusun resep satu langkah demi satu langkah.",
     optionalBadge: "opsional",
     requiredOnlyHint: "Hanya bahan wajib yang harus dicentang sebelum mulai. Bahan opsional bersifat saran.",
     backToPreview: "Kembali ke Pratinjau",

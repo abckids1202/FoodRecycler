@@ -45,6 +45,16 @@ const exactNoteTranslations = {
   "cook until fully set": "Masak hingga matang sempurna.",
   "check the leftover base and discard anything unsafe.": "Periksa bahan leftover utama dan buang apa pun yang tidak aman.",
   "check the leftover base and discard anything unsafe": "Periksa bahan leftover utama dan buang apa pun yang tidak aman.",
+  "check that the rice and any leftover lauk are safe to reuse.": "Pastikan nasi dan lauk sisa masih aman untuk digunakan kembali.",
+  "check that the rice and any leftover lauk are safe to reuse": "Pastikan nasi dan lauk sisa masih aman untuk digunakan kembali.",
+  "add leftover protein or vegetables and cook until hot.": "Masukkan protein atau sayuran sisa, lalu masak sampai panas.",
+  "add leftover protein or vegetables and cook until hot": "Masukkan protein atau sayuran sisa, lalu masak sampai panas.",
+  "add rice, break up clumps, and stir-fry over medium-high heat.": "Masukkan nasi, uraikan gumpalan, lalu tumis dengan api sedang-besar.",
+  "add rice, break up clumps, and stir-fry over medium-high heat": "Masukkan nasi, uraikan gumpalan, lalu tumis dengan api sedang-besar.",
+  "season with salt, kecap manis, sambal, or the listed spice base.": "Bumbui dengan garam, kecap manis, sambal, atau bumbu yang tersedia.",
+  "season with salt, kecap manis, sambal, or the listed spice base": "Bumbui dengan garam, kecap manis, sambal, atau bumbu yang tersedia.",
+  "cook until the rice is steaming hot, then serve immediately.": "Masak sampai nasi benar-benar panas dan beruap, lalu sajikan segera.",
+  "cook until the rice is steaming hot, then serve immediately": "Masak sampai nasi benar-benar panas dan beruap, lalu sajikan segera.",
   "mash, shred, or chop the main ingredient so it mixes evenly.": "Haluskan, suwir, atau potong bahan utama agar tercampur merata.",
   "combine with seasoning, egg or starch if needed, and fresh aromatics.": "Campurkan dengan bumbu, telur atau pati jika perlu, serta bumbu aromatik segar.",
   "shape into small pieces so the inside cooks evenly.": "Bentuk menjadi bagian kecil agar bagian dalam matang merata.",
@@ -98,6 +108,9 @@ export function localizeRecipeNote(note, language) {
   }
   if (lower.startsWith("inspect all leftovers first")) {
     return "Periksa semua leftover terlebih dahulu; buang jika berbau asam, berlendir, berjamur, berubah warna tidak wajar, atau terlalu lama tidak disimpan di kulkas.";
+  }
+  if (lower.startsWith("heat oil and")) {
+    return "Panaskan minyak, lalu tumis bawang, cabai, atau bumbu sampai harum.";
   }
   if (lower.startsWith("check the leftover base")) {
     return "Periksa bahan leftover utama dan buang apa pun yang tidak aman.";

@@ -11,7 +11,7 @@ import SafetyNotice from "../components/SafetyNotice.jsx";
 import { getPdfDownloadUrl } from "../api/pdfApi";
 import { getRecommendationDetail } from "../api/recipeApi";
 import { useApp } from "../context/AppContext.jsx";
-import { localizeIngredient, localizeRecipeNote, localizeRecipeValue, normalizeIngredientKey } from "../utils/recipeDisplay";
+import { buildCookingMaterials, localizeIngredient, localizeRecipeNote, localizeRecipeValue, normalizeIngredientKey } from "../utils/recipeDisplay";
 
 export default function RecipeDetail() {
   const { recipeId } = useParams();
@@ -50,6 +50,9 @@ export default function RecipeDetail() {
 
   const recipe = detail.recipe || {};
   const ingredients = uniqueLocalizedItems(recipe.ingredients || [], language);
+  const materials = buildCookingMaterials(detail, language);
+  const mainMaterials = materials.filter((item) => item.required || item.source === "detected" || item.source === "ingredient");
+  const additionalMaterials = materials.filter((item) => !item.required && item.source !== "detected" && item.source !== "ingredient");
   const steps = (recipe.steps || []).map((step) => localizeRecipeNote(step, language));
   const difficulty = localizeRecipeValue(recipe.difficulty || copy.defaultDifficulty, language);
   const safety = localizeRecipeValue(detail.safety_level, language);
@@ -79,16 +82,34 @@ export default function RecipeDetail() {
 
           <Card className="p-5">
             <h2 className="text-2xl font-black text-forest-900">{copy.ingredientsTitle}</h2>
+            <p className="mt-2 text-base leading-7 text-ink/65">{copy.ingredientsText}</p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {ingredients.map((ingredient) => (
-                <label key={ingredient} className="flex min-h-14 items-center gap-3 rounded-2xl bg-earth-50 px-4 py-3 text-base font-bold text-forest-900">
+              {(mainMaterials.length ? mainMaterials : ingredients.map((ingredient) => ({ label: ingredient }))).map((ingredient) => (
+                <label key={ingredient.label} className="flex min-h-14 items-center gap-3 rounded-2xl bg-earth-50 px-4 py-3 text-base font-bold text-forest-900">
                   <input
                     type="checkbox"
-                    checked={Boolean(checked[ingredient])}
-                    onChange={(event) => setChecked((current) => ({ ...current, [ingredient]: event.target.checked }))}
+                    checked={Boolean(checked[ingredient.label])}
+                    onChange={(event) => setChecked((current) => ({ ...current, [ingredient.label]: event.target.checked }))}
                     className="h-5 w-5 accent-forest-700"
                   />
-                  {ingredient}
+                  {ingredient.label}
+                </label>
+              ))}
+            </div>
+            <h3 className="mt-6 text-xl font-black text-forest-900">{copy.additionalsTitle}</h3>
+            <p className="mt-2 text-base leading-7 text-ink/65">{copy.additionalsText}</p>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {(additionalMaterials.length ? additionalMaterials : [{ label: copy.noAdditionals }]).map((ingredient) => (
+                <label key={ingredient.label} className="flex min-h-14 items-center gap-3 rounded-2xl bg-mint/60 px-4 py-3 text-base font-bold text-forest-900">
+                  {ingredient.label !== copy.noAdditionals && (
+                    <input
+                      type="checkbox"
+                      checked={Boolean(checked[ingredient.label])}
+                      onChange={(event) => setChecked((current) => ({ ...current, [ingredient.label]: event.target.checked }))}
+                      className="h-5 w-5 accent-forest-700"
+                    />
+                  )}
+                  {ingredient.label}
                 </label>
               ))}
             </div>
@@ -163,8 +184,8 @@ function localizeReason(detail, copy, language) {
 
 const detailCopy = {
   en: {
-    recipeBadge: "Recipe detail",
-    headerText: "Review ingredients, safety, and steps before cooking.",
+    recipeBadge: "Ingredient confirmation",
+    headerText: "Confirm main ingredients and optional additions before starting the guided cooking session.",
     time: "Time",
     difficulty: "Difficulty",
     servings: "Serving",
@@ -180,15 +201,19 @@ const detailCopy = {
     aiNotice: "Always check smell, texture, color, allergies, and storage time before eating leftovers.",
     whyTitle: "Why this recipe",
     reasonFallback: (name) => `${name} matches the leftovers you provided.`,
-    ingredientsTitle: "Ingredients checklist",
+    ingredientsTitle: "Main ingredients to confirm",
+    ingredientsText: "Check the ingredients you actually have. FoodLoop will keep optional items flexible.",
+    additionalsTitle: "Optional additions",
+    additionalsText: "Use these only if available. You can still cook without them when the recipe allows it.",
+    noAdditionals: "No optional additions listed",
     stepsTitle: "Steps preview",
     beforeTitle: "Before cooking",
     beforeItems: ["No rotten smell", "No slime or mold", "Stored safely", "Heat until steaming hot"],
     startMaking: "Start Cooking",
   },
   id: {
-    recipeBadge: "Detail resep",
-    headerText: "Cek bahan, keamanan, dan langkah sebelum mulai memasak.",
+    recipeBadge: "Konfirmasi bahan",
+    headerText: "Konfirmasi bahan utama dan tambahan opsional sebelum mulai memasak terpandu.",
     time: "Waktu",
     difficulty: "Tingkat",
     servings: "Porsi",
@@ -204,7 +229,11 @@ const detailCopy = {
     aiNotice: "Selalu cek bau, tekstur, warna, alergi, dan waktu penyimpanan sebelum memakan leftover.",
     whyTitle: "Mengapa resep ini cocok",
     reasonFallback: (name) => `${name} cocok dengan leftover yang Anda masukkan.`,
-    ingredientsTitle: "Checklist bahan",
+    ingredientsTitle: "Bahan utama yang perlu dikonfirmasi",
+    ingredientsText: "Centang bahan yang benar-benar Anda punya. FoodLoop akan membuat bahan opsional tetap fleksibel.",
+    additionalsTitle: "Tambahan opsional",
+    additionalsText: "Gunakan hanya jika tersedia. Anda tetap bisa memasak tanpa bahan ini jika resep memungkinkan.",
+    noAdditionals: "Tidak ada tambahan opsional",
     stepsTitle: "Pratinjau langkah",
     beforeTitle: "Sebelum memasak",
     beforeItems: ["Tidak bau busuk", "Tidak berlendir atau berjamur", "Disimpan dengan aman", "Panaskan sampai beruap panas"],
