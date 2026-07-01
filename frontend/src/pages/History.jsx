@@ -8,7 +8,9 @@ import LoadingState from "../components/LoadingState.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { getWasteHistory } from "../api/wasteApi";
 import { getUserCookingSessions } from "../api/recipeApi";
+import { getPdfDownloadUrl } from "../api/pdfApi";
 import { useApp } from "../context/AppContext.jsx";
+import { localizeIngredient } from "../utils/recipeDisplay";
 
 export default function History() {
   const { user, language } = useApp();
@@ -34,14 +36,15 @@ export default function History() {
           getUserCookingSessions(user.id),
         ]);
         if (!isMounted) return;
-        const analysisRows = analyses.map((analysis) => ({
+        const sessionAnalysisIds = new Set(sessions.map((session) => session.analysis_id).filter(Boolean));
+        const analysisRows = analyses.filter((analysis) => !sessionAnalysisIds.has(analysis.id)).map((analysis) => ({
           id: `analysis-${analysis.id}`,
           rawId: analysis.id,
           date: analysis.created_at,
           kind: "analysis",
           status: "not_started",
           title: analysis.recommendations?.[0]?.recipe_name || copy.safetyCheck,
-          leftovers: (analysis.items?.map((item) => item.display_name) || []).join(", ") || copy.noDetectedLeftovers,
+          leftovers: formatLeftovers(analysis.items, language, copy.noDetectedLeftovers),
           note: `${analysis.recommendations?.length || 0} ${copy.recipeIdeas}`,
           href: `/history/${analysis.id}`,
         }));
@@ -137,12 +140,30 @@ function HistoryCard({ row, copy }) {
             <RotateCcw size={16} /> {copy.cookAgain}
           </Button>
         )}
+        {row.status === "finished" && row.recommendationId && (
+          <Button as="a" href={getPdfDownloadUrl(row.recommendationId)} variant="secondary" className="min-h-11 rounded-2xl px-3">
+            <Download size={16} /> PDF
+          </Button>
+        )}
         <Button as={Link} to="/start" variant="secondary" className="min-h-11 rounded-2xl px-3">
           <ChefHat size={16} /> {copy.newRecipe}
         </Button>
       </div>
     </Card>
   );
+}
+
+function formatLeftovers(items = [], language, fallback) {
+  const seen = new Set();
+  const labels = [];
+  items.forEach((item) => {
+    const label = localizeIngredient(item.display_name || item.label, language);
+    const key = label.toLowerCase();
+    if (!label || seen.has(key)) return;
+    seen.add(key);
+    labels.push(label);
+  });
+  return labels.join(", ") || fallback;
 }
 
 function statusClass(status) {

@@ -10,6 +10,17 @@ const itemTranslations = {
   cabbage: "kol",
   carrot: "wortel",
   pepper: "lada",
+  stock: "kaldu",
+  ginger: "jahe",
+  "green onion": "daun bawang",
+  scallion: "daun bawang",
+  "fried shallot": "bawang goreng",
+  "fried shallots": "bawang goreng",
+  "soy sauce": "kecap",
+  "sweet soy sauce": "kecap manis",
+  "pot, ladle": "panci, sendok sayur",
+  pot: "panci",
+  ladle: "sendok sayur",
   "pan or pot": "wajan atau panci",
   stove: "kompor",
   knife: "pisau",
@@ -64,6 +75,14 @@ const exactNoteTranslations = {
   "fry or cook until the outside is crisp and the inside is hot.": "Goreng atau masak sampai bagian luar renyah dan bagian dalam panas.",
   "drain briefly and serve while warm.": "Tiriskan sebentar dan sajikan selagi hangat.",
   "drain briefly and serve while warm": "Tiriskan sebentar dan sajikan selagi hangat.",
+  "bring broth, water, or spice base to a simmer.": "Didihkan perlahan kaldu, air, atau bumbu dasar.",
+  "bring broth, water, or spice base to a simmer": "Didihkan perlahan kaldu, air, atau bumbu dasar.",
+  "add harder vegetables first, then leftover protein or softer ingredients.": "Masukkan sayuran yang lebih keras lebih dulu, lalu protein sisa atau bahan yang lebih lunak.",
+  "add harder vegetables first, then leftover protein or softer ingredients": "Masukkan sayuran yang lebih keras lebih dulu, lalu protein sisa atau bahan yang lebih lunak.",
+  "simmer until everything is hot throughout.": "Masak perlahan sampai semua bahan benar-benar panas.",
+  "simmer until everything is hot throughout": "Masak perlahan sampai semua bahan benar-benar panas.",
+  "adjust seasoning and add fresh garnish just before serving.": "Sesuaikan rasa dan tambahkan garnish segar tepat sebelum disajikan.",
+  "adjust seasoning and add fresh garnish just before serving": "Sesuaikan rasa dan tambahkan garnish segar tepat sebelum disajikan.",
 };
 
 const notePhraseTranslations = [
@@ -137,6 +156,18 @@ export function localizeRecipeNote(note, language) {
   if (lower.startsWith("drain briefly")) {
     return "Tiriskan sebentar dan sajikan selagi hangat.";
   }
+  if (lower.startsWith("bring broth")) {
+    return "Didihkan perlahan kaldu, air, atau bumbu dasar.";
+  }
+  if (lower.startsWith("add harder vegetables")) {
+    return "Masukkan sayuran yang lebih keras lebih dulu, lalu protein sisa atau bahan yang lebih lunak.";
+  }
+  if (lower.startsWith("simmer until")) {
+    return "Masak perlahan sampai semua bahan benar-benar panas.";
+  }
+  if (lower.startsWith("adjust seasoning")) {
+    return "Sesuaikan rasa dan tambahkan garnish segar tepat sebelum disajikan.";
+  }
   if (lower.startsWith("cook egg until fully set")) {
     return "Masak telur hingga matang sempurna, kecuali resep langsung disajikan dan panduan keamanan pangan memperbolehkannya.";
   }
@@ -169,14 +200,31 @@ export function localizeIngredient(rawItem, language) {
 
 export function normalizeIngredientKey(rawItem) {
   const parsed = parseIngredient(rawItem);
-  const name = localizeFoodPhrase(parsed.name, "id").toLowerCase();
+  const name = localizeFoodPhrase(parsed.name, "id")
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\b(sisa|leftover|opsional|wajib|required|optional)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (name.includes("nasi")) return "nasi";
   if (name.includes("telur")) return "telur";
   if (name.includes("sayur")) return "sayur";
+  if (name.includes("ayam")) return "ayam";
+  if (name.includes("tahu")) return "tahu";
+  if (name.includes("tempe")) return "tempe";
+  if (name.includes("sambal")) return "sambal";
+  if (name.includes("kaldu")) return "kaldu";
+  if (name.includes("jahe")) return "jahe";
+  if (name.includes("daun bawang")) return "daun-bawang";
+  if (name.includes("bawang goreng")) return "bawang-goreng";
+  if (name.includes("kecap")) return "kecap";
   if (name.includes("kol")) return "kol";
   if (name.includes("bawang putih")) return "bawang-putih";
   if (name.includes("bawang merah")) return "bawang-merah";
   if (name.includes("wortel")) return "wortel";
   if (name.includes("lada")) return "lada";
+  if (name.includes("panci") || name.includes("sendok sayur")) return "alat-masak";
+  if (name.includes("porsi")) return "porsi";
   return name.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "");
 }
 
@@ -244,19 +292,27 @@ function localizeFoodPhrase(value, language) {
     .replace(/\bcabbage\b/gi, "kol")
     .replace(/\bcarrot\b/gi, "wortel")
     .replace(/\bpepper\b/gi, "lada")
+    .replace(/\bstock\b/gi, "kaldu")
+    .replace(/\bginger\b/gi, "jahe")
+    .replace(/\bgreen onion\b/gi, "daun bawang")
+    .replace(/\bscallion\b/gi, "daun bawang")
+    .replace(/\bfried shallots?\b/gi, "bawang goreng")
+    .replace(/\bsweet soy sauce\b/gi, "kecap manis")
+    .replace(/\bsoy sauce\b/gi, "kecap")
+    .replace(/\bpot\b/gi, "panci")
+    .replace(/\bladle\b/gi, "sendok sayur")
     .replace(/\bknife\b/gi, "pisau")
     .replace(/\bcutting board\b/gi, "talenan")
     .replace(/\bstove\b/gi, "kompor")
     .replace(/\bpan or pot\b/gi, "wajan atau panci")
     .replace(/\bpieces\b/gi, "butir")
-    .replace(/\bcup\b/gi, "cup");
+    .replace(/\bcup\b/gi, "cup")
+    .replace(/fried bawang merah/gi, "bawang goreng");
 }
 
 function formatIngredient(item, language) {
   if (item.isTool) return language === "id" ? `Alat: ${item.name}` : `Tools: ${item.name}`;
   if (item.isServing) return language === "id" ? `Perkiraan porsi: ${item.name}` : `Estimated servings: ${item.name}`;
-  if (item.isOptional) return language === "id" ? `${item.name} (opsional)` : `${item.name} (optional)`;
-  if (item.original.toLowerCase().includes("required")) return language === "id" ? `${item.name} (wajib)` : `${item.name} (required)`;
   return item.name;
 }
 

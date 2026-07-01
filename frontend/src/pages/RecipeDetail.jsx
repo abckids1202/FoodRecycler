@@ -78,9 +78,9 @@ export default function RecipeDetail() {
           <Card className="p-5">
             <h2 className="text-2xl font-black text-forest-900">{copy.stepsTitle}</h2>
             <p className="mt-2 text-base leading-7 text-ink/65">{copy.stepsText}</p>
-            <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {steps.map((step, index) => (
-                <article key={`${step}-${index}`} className="min-w-[260px] flex-1 rounded-3xl bg-earth-50 p-4">
+                <article key={`${step}-${index}`} className="rounded-3xl bg-earth-50 p-4">
                   <span className="grid h-10 w-10 place-items-center rounded-2xl bg-forest-900 text-sm font-black text-white">{index + 1}</span>
                   <p className="mt-3 text-sm font-semibold leading-6 text-ink/75">{step}</p>
                 </article>
