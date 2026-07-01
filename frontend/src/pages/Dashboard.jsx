@@ -1,4 +1,5 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Check, Copy, MessageCircle, Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import DashboardStats from "../components/DashboardStats.jsx";
 import EmptyState from "../components/EmptyState.jsx";
@@ -15,8 +16,30 @@ export default function Dashboard() {
   const [materialData, setMaterialData] = useState([]);
   const [recipeData, setRecipeData] = useState([]);
   const [stopReasonData, setStopReasonData] = useState([]);
+  const [copiedWebhook, setCopiedWebhook] = useState("");
   const [status, setStatus] = useState("loading");
   const [error, setError] = useState("");
+  const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || "https://foodrecycler.onrender.com").replace(/\/$/, "");
+  const webhookLinks = [
+    {
+      id: "telegram",
+      icon: Send,
+      label: "Telegram webhook",
+      value: `${apiBaseUrl}/api/bots/telegram/webhook`,
+    },
+    {
+      id: "telegram-set",
+      icon: Send,
+      label: "Telegram set webhook",
+      value: `${apiBaseUrl}/api/bots/telegram/set-webhook`,
+    },
+    {
+      id: "whatsapp",
+      icon: MessageCircle,
+      label: "WhatsApp callback URL",
+      value: `${apiBaseUrl}/api/bots/whatsapp/webhook`,
+    },
+  ];
 
   useEffect(() => {
     let isMounted = true;
@@ -67,6 +90,33 @@ export default function Dashboard() {
         title={t.dashboardTitle}
         description={t.dashboardDescription}
       />
+      <section className="rounded-[2rem] border border-forest-900/10 bg-white p-5 shadow-soft">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-forest-700">{copy.webhookEyebrow}</p>
+            <h2 className="mt-1 text-2xl font-black text-forest-900">{copy.webhookTitle}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-ink/65">{copy.webhookText}</p>
+          </div>
+          <span className="rounded-full bg-mint px-4 py-2 text-xs font-black text-forest-900">{copy.webhookBadge}</span>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {webhookLinks.map((item) => (
+            <WebhookCard
+              key={item.id}
+              item={item}
+              copied={copiedWebhook === item.id}
+              copyLabel={copy.copyWebhook}
+              copiedLabel={copy.copiedWebhook}
+              onCopy={async () => {
+                await navigator.clipboard.writeText(item.value);
+                setCopiedWebhook(item.id);
+                window.setTimeout(() => setCopiedWebhook(""), 1600);
+              }}
+            />
+          ))}
+        </div>
+        <p className="mt-3 text-xs font-semibold leading-5 text-ink/55">{copy.webhookSafety}</p>
+      </section>
       {status === "loading" && <LoadingState title={copy.loadingTitle} message={copy.loadingMessage} />}
       {status === "error" && <ErrorState title={copy.errorTitle} message={error} />}
       {status === "ready" && summary && (
@@ -106,9 +156,41 @@ function InsightCard({ summary, copy }) {
   );
 }
 
+function WebhookCard({ item, copied, copyLabel, copiedLabel, onCopy }) {
+  const Icon = item.icon;
+  return (
+    <article className="rounded-2xl border border-forest-900/10 bg-earth-50 p-4">
+      <div className="flex items-center gap-2">
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-forest-900 text-white">
+          <Icon size={17} />
+        </span>
+        <h3 className="font-black text-forest-900">{item.label}</h3>
+      </div>
+      <p className="mt-3 break-all rounded-xl bg-white p-3 text-xs font-semibold leading-5 text-ink/70">
+        {item.value}
+      </p>
+      <button
+        type="button"
+        onClick={onCopy}
+        className="focus-ring mt-3 inline-flex min-h-10 items-center gap-2 rounded-xl bg-forest-900 px-4 text-sm font-black text-white"
+      >
+        {copied ? <Check size={16} /> : <Copy size={16} />}
+        {copied ? copiedLabel : copyLabel}
+      </button>
+    </article>
+  );
+}
+
 const dashboardCopy = {
   en: {
     eyebrow: "Analytics",
+    webhookEyebrow: "Bot setup",
+    webhookTitle: "Webhook URLs for Telegram and WhatsApp",
+    webhookText: "Use these public backend URLs when connecting the chat bots. They are shown here so the team can copy them quickly during setup or demo checks.",
+    webhookBadge: "Developer info",
+    webhookSafety: "Do not paste API tokens here. Keep Telegram tokens and WhatsApp access tokens only in Render environment variables.",
+    copyWebhook: "Copy URL",
+    copiedWebhook: "Copied",
     noneYet: "None yet",
     loadingTitle: "Loading dashboard",
     loadingMessage: "Reading your saved analyses and recommendations.",
@@ -128,6 +210,13 @@ const dashboardCopy = {
   },
   id: {
     eyebrow: "Analitik",
+    webhookEyebrow: "Setup bot",
+    webhookTitle: "URL webhook Telegram dan WhatsApp",
+    webhookText: "Gunakan URL backend publik ini saat menghubungkan bot chat. Ditampilkan di sini supaya tim mudah menyalin saat setup atau pengecekan demo.",
+    webhookBadge: "Info developer",
+    webhookSafety: "Jangan tempel token API di sini. Simpan token Telegram dan access token WhatsApp hanya di environment variables Render.",
+    copyWebhook: "Salin URL",
+    copiedWebhook: "Tersalin",
     noneYet: "Belum ada",
     loadingTitle: "Memuat dashboard",
     loadingMessage: "Mengambil analisis dan rekomendasi tersimpan.",
